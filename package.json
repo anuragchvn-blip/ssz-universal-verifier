@@ -1,0 +1,19 @@
+{
+  "name": "ssz-universal-verifier-workspace",
+  "version": "1.0.0",
+  "description": "Streaming 32-byte Chunk Producer + Incremental Merkleizer with strict SSZ canonical checks",
+  "type": "commonjs",
+  "bin": {
+    "ssz-verify": "bin/ssz-verify.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node dist/tests/vectors.js",
+    "cli": "node bin/ssz-verify.js",
+    "build:wasm": "echo 'WASM build: use AssemblyScript or tsc + wasm-opt. See README for manual steps.'"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.0.0"
+  }
+}

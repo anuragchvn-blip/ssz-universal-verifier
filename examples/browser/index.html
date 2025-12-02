@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SSZ Universal Verifier Demo</title>
+    <script src="../../dist/browser/ssz-universal-verifier.min.js"></script>
+  </head>
+  <body>
+    <h1>SSZ Universal Verifier Demo</h1>
+    <p>Open console to see verification results.</p>
+    <script>
+      console.log("SSZ Verifier loaded:", SSZ);
+
+      // Test vector: uint64(0)
+      const uint64Type = { kind: SSZ.TypeKind.Basic, fixedSize: 8 };
+      const data = new Uint8Array(8); // 0
+
+      console.log("Verifying uint64(0)...");
+      const result = SSZ.sszStreamRootFromSlice(uint64Type, data);
+
+      if (result.root) {
+        const hex = Array.from(result.root)
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+        console.log("SUCCESS: Root =", hex);
+        document.body.innerHTML += `<p style="color:green">SUCCESS: Root = ${hex}</p>`;
+      } else {
+        console.error("FAILURE:", result.error, result.msg);
+        document.body.innerHTML += `<p style="color:red">FAILURE: ${result.msg}</p>`;
+      }
+    </script>
+  </body>
+</html>

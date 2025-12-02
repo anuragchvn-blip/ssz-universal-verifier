@@ -1,0 +1,5 @@
+TypeScript tests passed (23/23 vectors).
+Rust build verified (release mode).
+C build skipped (no compiler).
+WASM build skipped (requires manual toolchain steps).
+RISC-V cross-compile skipped (no toolchain).

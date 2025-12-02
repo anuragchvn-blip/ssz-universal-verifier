@@ -1,0 +1,9 @@
+dist/browser/ssz-universal-verifier.min.js
+examples/browser/index.html
+bin/ssz-verify.js
+c-skel/src/ssz_stream.c
+c-skel/src/hash.c
+rust-skel/src/lib.rs
+rust-skel/src/hash.rs
+build/report.json
+build/report.txt

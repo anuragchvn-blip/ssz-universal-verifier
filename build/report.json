@@ -1,0 +1,9 @@
+{
+  "ts_tests_passed": true,
+  "ts_passed": 23,
+  "ts_failed": 0,
+  "c_build": false,
+  "rust_build": true,
+  "wasm_built": false,
+  "riscv_cross_ok": false
+}

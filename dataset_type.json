@@ -1,0 +1,8 @@
+{
+  "kind": 2,
+  "elementType": {
+    "kind": 0,
+    "fixedSize": 8
+  },
+  "limit": 10000
+}

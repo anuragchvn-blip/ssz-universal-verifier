@@ -65,8 +65,6 @@ const listBytes32 = { kind: index_js_1.TypeKind.List, elementType: bytes32Type }
     const data = new Uint8Array(32);
     data.set(elem, 0);
     const res = (0, index_js_1.sszStreamRootFromSlice)(listBytes32, data);
-    if ('error' in res)
-        console.log(`Test 4 error: ${res.error}, ${res.msg}`);
     assert('root' in res, 'single-element list<bytes32> should succeed');
     if ('root' in res) {
         console.log(`single-element list<bytes32> root: ${hex(res.root)}`);
@@ -95,8 +93,6 @@ const listBytes32 = { kind: index_js_1.TypeKind.List, elementType: bytes32Type }
     data.set(offset, 16);
     data.set(field3, 20);
     const res = (0, index_js_1.sszStreamRootFromSlice)(containerType, data);
-    if ('error' in res)
-        console.log(`Test 5 (container) error: ${res.error}, ${res.msg}`);
     assert('root' in res, 'container {uint64,uint64,bytes} should succeed');
     if ('root' in res) {
         console.log(`container root: ${hex(res.root)}`);
@@ -107,8 +103,6 @@ const listBytes32 = { kind: index_js_1.TypeKind.List, elementType: bytes32Type }
     const bitlistType = { kind: index_js_1.TypeKind.Bitlist };
     const data = fromHex('10'); // bitlist with 4 bits (0000) and sentinel
     const res = (0, index_js_1.sszStreamRootFromSlice)(bitlistType, data);
-    if ('error' in res)
-        console.log(`Test 6 (bitlist) error: ${res.error}, ${res.msg}`);
     assert('root' in res, 'bitlist valid padding should succeed');
 }
 // Test 7: uint64 non-zero
@@ -240,8 +234,6 @@ const listBytes32 = { kind: index_js_1.TypeKind.List, elementType: bytes32Type }
     };
     const data = new Uint8Array(10);
     const res = (0, index_js_1.sszStreamRootFromSlice)(containerType, data);
-    if ('error' in res)
-        console.log(`Test 18 error: ${res.error}, ${res.msg}`);
     assert('error' in res && res.error === index_js_1.SszError.MalformedHeader, 'container too short should fail');
 }
 // Test 19: list<bytes32> trailing bytes

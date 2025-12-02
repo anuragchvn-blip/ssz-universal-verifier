@@ -14,9 +14,4 @@ sha2 = { version = "0.10", default-features = false }
 panic = "abort"
 opt-level = "z"
 lto = true
-# no_std compatible: add dependencies here if needed
-
-[profile.release]
-opt-level = "z"
-lto = true
 codegen-units = 1

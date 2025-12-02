@@ -8,7 +8,11 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "node dist/tests/vectors.js",
+    "test": "npm run test:basic && npm run test:extended",
+    "test:basic": "node dist/tests/vectors.js",
+    "test:extended": "node dist/tests/extended-vectors.js",
+    "test:all": "npm run test:basic && npm run test:extended",
+    "bench": "node dist/tests/benchmarks.js",
     "cli": "node bin/ssz-verify.js",
     "build:wasm": "echo 'WASM build: use AssemblyScript or tsc + wasm-opt. See README for manual steps.'"
   },

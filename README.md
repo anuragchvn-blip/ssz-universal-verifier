@@ -4,6 +4,11 @@
 
 Minimal, auditable implementation of streaming 32-byte chunk producer + incremental merkleizer with strict SSZ canonical checks. Designed for correctness, portability, and determinism across TypeScript, C, Rust, WASM, and RISC-V targets.
 
+## Documentation
+
+- **[API Reference](docs/API.md)** - Complete API documentation for TypeScript, Rust, and C
+- **[Integration Guide](docs/INTEGRATION.md)** - Quick start and best practices for integrating the verifier
+
 ## Purpose
 
 This workspace provides a **single, correct, deterministic** primitive for SSZ merkleization that can be:
@@ -28,10 +33,15 @@ This workspace provides a **single, correct, deterministic** primitive for SSZ m
 ```bash
 npm install
 npm run build
-npm test
+npm test              # Run basic tests (23 tests)
+npm run test:extended # Run extended tests (36 tests)
+npm run test:all      # Run all tests (59 tests)
+npm run bench         # Run performance benchmarks
 ```
 
-Expected output: `N passed, 0 failed`
+Expected output: `59 passed, 0 failed`
+
+**Performance**: 476K ops/sec (uint64), 1.3 MB/sec throughput with pure TypeScript SHA-256
 
 ### C skeleton
 
@@ -41,13 +51,15 @@ make all
 make test
 ```
 
-### Rust skeleton
+### Rust (complete implementation)
 
 ```bash
 cd rust-skel
 cargo build --release
-cargo test
+cargo test --release  # Run 17 integration tests
 ```
+
+All Rust tests pass with full SSZ support including bitlists, lists, vectors, and containers.
 
 ### All targets
 

@@ -1,0 +1,97 @@
+name: RISC-V Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'c-skel/**'
+      - '.github/workflows/riscv.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'c-skel/**'
+      - '.github/workflows/riscv.yml'
+
+jobs:
+  test-riscv-docker:
+    name: RISC-V Tests (Docker)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run RISC-V tests in Docker
+        run: |
+          docker run --rm -v $PWD:/work -w /work/c-skel \
+            riscv64/ubuntu:22.04 bash -c "
+              apt-get update && \
+              apt-get install -y build-essential && \
+              make test-riscv
+            "
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: riscv-test-results
+          path: c-skel/build/
+          retention-days: 7
+
+  test-riscv-qemu:
+    name: RISC-V Tests (QEMU)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install RISC-V toolchain and QEMU
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-riscv64-linux-gnu \
+            qemu-user \
+            qemu-user-static
+      
+      - name: Build for RISC-V
+        run: |
+          cd c-skel
+          CC=riscv64-linux-gnu-gcc make test-riscv
+      
+      - name: Run tests with QEMU
+        run: |
+          cd c-skel
+          qemu-riscv64-static -L /usr/riscv64-linux-gnu ./build/test_ssz
+
+  benchmark-riscv:
+    name: RISC-V Performance Benchmark
+    runs-on: ubuntu-latest
+    needs: [test-riscv-docker]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run benchmarks
+        run: |
+          docker run --rm -v $PWD:/work -w /work/c-skel \
+            riscv64/ubuntu:22.04 bash -c "
+              apt-get update && \
+              apt-get install -y build-essential time && \
+              make test-riscv && \
+              echo '=== Performance Test ===' && \
+              /usr/bin/time -v ./build/test_ssz 2>&1 | grep -E '(Maximum|User time|System time|Percent of CPU)'
+            "
+      
+      - name: Comment benchmark results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ RISC-V tests passed and benchmarks completed!'
+            })

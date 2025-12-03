@@ -26,12 +26,23 @@ test: $(SRC)
 	@echo "Running test suite..."
 	./$(BUILD_DIR)/test_ssz
 
-# RISC-V cross-compilation
+# RISC-V cross-compilation and testing
 riscv:
 	@echo "Cross-compiling for RISC-V (requires $(RISCV_CC))..."
 	$(RISCV_CC) $(RISCV_CFLAGS) -c src/ssz_stream.c -o src/ssz_stream.riscv.o
 	$(RISCV_CC) $(RISCV_CFLAGS) -c src/hash.c -o src/hash.riscv.o
 	@echo "RISC-V objects created: src/*.riscv.o"
+
+# RISC-V test build (for Docker/QEMU)
+test-riscv:
+	@echo "Building RISC-V test suite..."
+	mkdir -p $(BUILD_DIR)
+	$(CC) $(TEST_CFLAGS) -o $(BUILD_DIR)/test_ssz tests/test_ssz.c $(SRC)
+	@echo ""
+	@echo "Running RISC-V tests..."
+	./$(BUILD_DIR)/test_ssz
+	@echo ""
+	@echo "✓ RISC-V tests passed!"
 
 # Memory safety checks with Valgrind
 valgrind: test

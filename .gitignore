@@ -1,0 +1,8 @@
+﻿# AFL++ fuzzing outputs
+findings/
+fuzz_test.log
+
+# Compiled fuzzers
+c-skel/fuzz/fuzz_ssz_persistent
+c-skel/fuzz/fuzz_ssz_traditional
+c-skel/fuzz/fuzz_ssz_debug

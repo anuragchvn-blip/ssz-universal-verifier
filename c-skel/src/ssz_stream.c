@@ -1,8 +1,8 @@
 #include "ssz_stream.h"
 #include <string.h>
+#include <stdio.h>
 
 #ifdef HOST_TEST
-#include <stdio.h>
 #define MAX_STACK_DEPTH 64
 #else
 #define MAX_STACK_DEPTH 32

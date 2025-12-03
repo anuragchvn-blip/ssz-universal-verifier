@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "../include/ssz_stream.h"
 
 /* AFL++ fuzzing harness for SSZ verifier */

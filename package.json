@@ -1,5 +1,5 @@
 {
-  "name": "@ssz-universal/verifier",
+  "name": "ssz-universal-verifier",
   "version": "1.0.0",
   "description": "Production-grade, zero-dependency SSZ verifier with universal platform support (TypeScript, C, Rust, WASM)",
   "keywords": ["ssz", "ethereum", "merkle", "verification", "zero-dependency", "wasm", "risc-v", "embedded"],
@@ -20,12 +20,16 @@
     "ssz-verify": "bin/ssz-verify.js"
   },
   "files": [
-    "dist/",
+    "dist/src/**/*.js",
+    "dist/src/**/*.d.ts",
     "bin/",
     "src/",
-    "c-skel/",
-    "rust-skel/",
-    "wasm/",
+    "c-skel/src/",
+    "c-skel/include/",
+    "c-skel/Makefile",
+    "c-skel/tests/",
+    "rust-skel/src/",
+    "rust-skel/Cargo.toml",
     "README.md",
     "LICENSE",
     "CONTRIBUTING.md",

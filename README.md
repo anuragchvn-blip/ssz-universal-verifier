@@ -24,13 +24,11 @@ Minimal, auditable implementation (~2,300 LOC) of streaming SSZ merkleization wi
 ## 🚀 Quick Start
 
 ```bash
-npm install
-npm run build
-npm test  # 59/59 tests passing
+npm install ssz-universal-verifier
 ```
 
 ```typescript
-import { sszStreamRootFromSlice, TypeDesc, TypeKind } from "./src/index.js";
+import { sszStreamRootFromSlice, TypeDesc, TypeKind } from "ssz-universal-verifier";
 
 const uint64Type: TypeDesc = { kind: TypeKind.Basic, fixedSize: 8 };
 const data = new Uint8Array(8);

@@ -4,7 +4,7 @@
  */
 
 const { parentPort, workerData } = require('worker_threads');
-const sha256 = require('@chainsafe/as-sha256');
+import { hashParent } from './hash.js';
 
 interface WorkerData {
   chunks: Uint8Array[];
@@ -30,13 +30,16 @@ function computeRoot(chunks: Uint8Array[]): Uint8Array {
         batch.push(combined);
       }
       
-      const results = sha256.batchHash4UintArray64s(batch);
-      nextLevel.push(...results);
+      for (const combined of batch) {
+        const left = combined.subarray(0, 32);
+        const right = combined.subarray(32, 64);
+        nextLevel.push(hashParent(left, right));
+      }
       i += 8;
     }
     
     while (i + 1 < currentLevel.length) {
-      const parent = sha256.digest2Bytes32(currentLevel[i], currentLevel[i + 1]);
+      const parent = hashParent(currentLevel[i], currentLevel[i + 1]);
       nextLevel.push(parent);
       i += 2;
     }

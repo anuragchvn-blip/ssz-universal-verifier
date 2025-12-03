@@ -3,7 +3,7 @@
  * Goal: Achieve 3M+ hash operations per second in tree context
  */
 
-import * as sha256 from '@chainsafe/as-sha256';
+import { hashParent } from './hash.js';
 
 /**
  * Optimized merkleization using batch operations
@@ -36,15 +36,18 @@ export function computeRootFromChunksOptimized(chunks: Uint8Array[]): Uint8Array
         batch.push(combined);
       }
       
-      // Hash 4 parent nodes in parallel
-      const results = sha256.batchHash4UintArray64s(batch);
-      nextLevel.push(...results);
+      // Hash 4 parent nodes
+      for (const combined of batch) {
+        const left = combined.subarray(0, 32);
+        const right = combined.subarray(32, 64);
+        nextLevel.push(hashParent(left, right));
+      }
       i += 8;
     }
     
     // Process remaining pairs individually
     while (i + 1 < currentLevel.length) {
-      const parent = sha256.digest2Bytes32(currentLevel[i], currentLevel[i + 1]);
+      const parent = hashParent(currentLevel[i], currentLevel[i + 1]);
       nextLevel.push(parent);
       i += 2;
     }

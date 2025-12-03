@@ -6,7 +6,7 @@ This project fully supports RISC-V architecture. You can:
 - ✅ Build and test on RISC-V hardware
 - ✅ Cross-compile from x86/ARM to RISC-V
 - ✅ Test with QEMU emulation
-- ✅ Run in zkVM environments (RISC Zero, SP1)
+- ⏳ Run in zkVM environments (RISC Zero, SP1) - In Development
 
 ## Quick Test (Docker - All Platforms)
 

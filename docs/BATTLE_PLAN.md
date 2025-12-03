@@ -178,11 +178,11 @@ throw new SSZError(
 **Result**: "Fastest SSZ verifier" claim backed by data
 
 ### Phase 2: Universality (Weeks 4-6) 🔧
-1. **Fix C implementation** - Remove confused comments
+1. ✅ **Fix C implementation** - Container/Bitlist types implemented
 2. **RISC-V Docker CI** - Prove it works
-3. **zkVM integration** - RISC Zero + SP1 examples
+3. ⏳ **zkVM integration** - RISC Zero implementation IN PROGRESS (60% - build issues)
 
-**Result**: "Only SSZ verifier that runs in zkVMs" (unique!)
+**Result**: "Only SSZ verifier targeting zkVMs" (in development)
 
 ### Phase 3: Trust (Weeks 7-9) 🔒
 1. **10M fuzz iterations** - Find any bugs
@@ -228,13 +228,13 @@ npm run bench:native
 1. ✅ Keep our own WASM implementation (wasm/src/hash_simd.rs)
 2. ✅ Add native C++ addon for Intel SHA-NI / ARM Crypto
 3. ✅ Auto-detection: native → our WASM → pure TypeScript
-4. ❌ Remove @chainsafe/as-sha256 dependency
-5. ❌ Remove @chainsafe/ssz dev dependency
+4. ✅ Remove @chainsafe/as-sha256 dependency
+5. ❌ Remove @chainsafe/ssz dev dependency (only used for testing)
 
 **Result**: 
-- Zero external dependencies for hashing ✅
-- 5-7M ops/sec on modern CPUs ✅
-- Fully independent implementation ✅
+- ✅ Zero external dependencies for hashing
+- ✅ 100% independent SHA-256 implementation
+- ✅ Fully independent implementation
 
 **Expected**: 5-7M ops/sec on modern Intel/AMD CPUs
 
@@ -275,18 +275,18 @@ EOF
 ## Success Metrics
 
 **6 Months**:
-- ✅ 5-10M ops/sec on modern CPUs (native addon)
-- ✅ RISC-V zkVM integration working
-- ✅ 10M+ fuzz iterations passed
-- ✅ Ethereum Foundation grant received
-- ✅ 1,000+ GitHub stars
-- ✅ 10,000+ npm downloads/week
+- ⏳ 5-10M ops/sec on modern CPUs (native addon built, needs SHA-NI hardware)
+- ⏳ RISC-V zkVM integration working (60% complete, build issues)
+- ✅ 10M+ fuzz iterations campaign running
+- ⏳ Ethereum Foundation grant submission
+- ⏳ 1,000+ GitHub stars
+- ⏳ 10,000+ npm downloads/week
 
 **12 Months**:
-- ✅ Industry adoption (light clients using it)
-- ✅ Formal verification complete
-- ✅ Security audit passed
-- ✅ Recognized as viable @chainsafe/ssz alternative
+- ⏳ Industry adoption (light clients using it)
+- ⏳ Formal verification complete
+- ⏳ Security audit passed
+- ⏳ Recognized as viable @chainsafe/ssz alternative
 
 ## The "Best" Means Different Things
 

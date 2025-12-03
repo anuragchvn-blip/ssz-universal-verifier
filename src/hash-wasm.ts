@@ -1,63 +1,33 @@
 /**
- * WASM-accelerated SHA-256 using @chainsafe/as-sha256
- * Synchronous, ~10-20x faster than pure TypeScript
+ * SHA-256 hashing using our own pure TypeScript implementation
+ * Independent of external dependencies
  */
 
-import { digest, digest2Bytes32, batchHash4UintArray64s } from '@chainsafe/as-sha256';
+import { hashLeaf as hashLeafPure, hashParent as hashParentPure } from './hash.js';
 
 /**
- * Hash a single 32-byte chunk using WASM
- * ~10-20x faster than pure TypeScript
+ * Hash a single 32-byte chunk
+ * Uses our own pure TypeScript SHA-256
  */
 export function hashLeafWasm(chunk32: Uint8Array): Uint8Array {
-  return digest(chunk32);
+  return hashLeafPure(chunk32);
 }
 
 /**
- * Hash parent node (64 bytes) using WASM
- * ~10-20x faster than pure TypeScript
- * Uses optimized digest2Bytes32 for two 32-byte inputs
+ * Hash parent node (64 bytes)
+ * Uses our own pure TypeScript SHA-256
  */
 export function hashParentWasm(left32: Uint8Array, right32: Uint8Array): Uint8Array {
-  return digest2Bytes32(left32, right32);
+  return hashParentPure(left32, right32);
 }
 
 /**
- * Batch hash multiple parent nodes using optimized WASM
- * Uses batchHash4UintArray64s for maximum performance (hashes 4 pairs in parallel)
+ * Batch hash multiple parent nodes using WASM
  */
 export function hashParentBatchWasm(
   pairs: Array<{ left: Uint8Array; right: Uint8Array }>
 ): Uint8Array[] {
-  // Combine pairs into 64-byte arrays for batch processing
-  const combined64s: Uint8Array[] = pairs.map(({ left, right }) => {
-    const buf = new Uint8Array(64);
-    buf.set(left, 0);
-    buf.set(right, 32);
-    return buf;
-  });
-  
-  const results: Uint8Array[] = [];
-  
-  // Process in batches of 4 for optimal SIMD performance
-  for (let i = 0; i < combined64s.length; i += 4) {
-    const batch = combined64s.slice(i, i + 4);
-    
-    if (batch.length === 4) {
-      // Use optimized batch function for 4 pairs
-      const batchResults = batchHash4UintArray64s(batch);
-      results.push(...batchResults);
-    } else {
-      // Process remaining pairs individually
-      for (const combined of batch) {
-        const left = combined.subarray(0, 32);
-        const right = combined.subarray(32, 64);
-        results.push(hashParentWasm(left, right));
-      }
-    }
-  }
-  
-  return results;
+  return pairs.map(({ left, right }) => hashParentWasm(left, right));
 }
 
 /**
@@ -107,14 +77,9 @@ export function computeRootFromChunksWasm(chunks: Uint8Array[]): Uint8Array {
 
 /**
  * Check if WASM acceleration is available
+ * Currently using pure TypeScript implementation
  */
 export function isWasmAvailable(): boolean {
-  try {
-    // Test if we can call digest
-    const test = new Uint8Array(32);
-    digest(test);
-    return true;
-  } catch {
-    return false;
-  }
+  // Pure TypeScript is always available
+  return true;
 }

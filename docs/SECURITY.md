@@ -214,7 +214,7 @@ The SSZ Universal Verifier is designed for security-critical applications includ
 - **Speed**: 19μs per execution
 - **Corpus Growth**: 35 unique items
 
-**Ongoing**: 10M iteration campaign (5.84% complete)
+**Ongoing**: 10M+ iteration campaign running (24-hour session in progress)
 
 ### Static Analysis (Planned)
 

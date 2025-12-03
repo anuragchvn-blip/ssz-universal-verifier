@@ -131,7 +131,7 @@ Once tested on ESP32:
 ✅ Server: 3-5M ops/sec (WASM + SIMD)
 ✅ Browser: 790K ops/sec (WebAssembly)
 ✅ **ESP32: 10K hashes/sec (<50KB RAM)** ⭐ NEW!
-✅ RISC-V: zkVM support (RISC Zero, SP1)
+⏳ RISC-V: zkVM support (RISC Zero, SP1) - In Development
 
 **Smallest footprint SSZ verifier - runs on $5 chips!**
 ```

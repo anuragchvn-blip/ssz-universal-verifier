@@ -1,4 +1,35 @@
-﻿# AFL++ fuzzing outputs
+﻿# Build artifacts
+dist/
+build/
+node_modules/
+target/
+*.o
+*.a
+*.so
+*.dylib
+*.node
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# Native addon builds
+native/build/
+native/node_modules/
+
+# WASM builds
+wasm/pkg/
+wasm/target/
+wasm/node_modules/
+
+# Test outputs
+c-skel/build/
+c-skel/fuzz/findings/
+c-skel/fuzz/findings_new/
+*.log
+
+# AFL++ fuzzing outputs
 findings/
 fuzz_test.log
 
@@ -6,3 +37,34 @@ fuzz_test.log
 c-skel/fuzz/fuzz_ssz_persistent
 c-skel/fuzz/fuzz_ssz_traditional
 c-skel/fuzz/fuzz_ssz_debug
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+flycheck*
+
+# Rust
+rust-skel/target/
+Cargo.lock
+
+# zkVM (keep source, ignore builds)
+zkvm/risc-zero/target/
+zkvm/risc-zero/host/target/
+zkvm/risc-zero/guest/target/
+
+# NPM
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

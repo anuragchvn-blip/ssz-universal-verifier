@@ -1,0 +1,14 @@
+[package]
+name = "ssz-zkvm-methods"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+risc0-zkvm = { workspace = true }
+
+[build-dependencies]
+risc0-build = { workspace = true }
+
+[[bin]]
+name = "ssz_verify"
+path = "guest/src/main.rs"

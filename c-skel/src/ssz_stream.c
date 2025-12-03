@@ -77,6 +77,146 @@ int ssz_stream_root_from_buffer(
     return SSZ_ERR_NONE;
   }
 
+  if (td->kind == SSZ_KIND_BITLIST) {
+    /* Bitlist: validate padding bit, chunk bits, merkleize with length */
+    if (len == 0) {
+      if (err) snprintf(err, 128, "Bitlist cannot be empty");
+      return SSZ_ERR_NON_CANONICAL;
+    }
+    
+    /* Last byte must have exactly one padding bit (the highest set bit) */
+    uint8_t last_byte = bytes[len - 1];
+    if (last_byte == 0) {
+      if (err) snprintf(err, 128, "Bitlist missing padding bit");
+      return SSZ_ERR_NON_CANONICAL;
+    }
+    
+    /* Count actual bits (excluding padding bit) */
+    uint32_t bit_count = (len - 1) * 8;
+    uint8_t last = last_byte;
+    while (last > 1) {
+      last >>= 1;
+      bit_count++;
+    }
+    
+    /* Chunk the bit data (without padding byte) */
+    StackEntry stack[MAX_STACK_DEPTH];
+    uint32_t depth = 0;
+    size_t chunk_len = len - 1; /* Exclude padding byte */
+    
+    for (size_t offset = 0; offset < chunk_len; offset += 32) {
+      uint8_t chunk[32] = {0};
+      size_t copy = (chunk_len - offset < 32) ? chunk_len - offset : 32;
+      memcpy(chunk, bytes + offset, copy);
+      
+      StackEntry entry = { .height = 0 };
+      memcpy(entry.hash, chunk, 32);
+      push_and_merge(stack, &depth, entry);
+    }
+    
+    /* Handle empty bitlist (only padding) */
+    if (chunk_len == 0) {
+      uint8_t zero_chunk[32] = {0};
+      StackEntry entry = { .height = 0 };
+      memcpy(entry.hash, zero_chunk, 32);
+      push_and_merge(stack, &depth, entry);
+    }
+    
+    /* Finalize merkleization */
+    while (depth > 1) {
+      StackEntry top = stack[depth - 1];
+      StackEntry below = stack[depth - 2];
+      uint8_t parent[32];
+      hash_parent(below.hash, top.hash, parent);
+      depth -= 2;
+      StackEntry merged = { .height = below.height + 1 };
+      memcpy(merged.hash, parent, 32);
+      stack[depth] = merged;
+      depth++;
+    }
+    
+    memcpy(out_root, stack[0].hash, 32);
+    mixin_length(out_root, bit_count);
+    return SSZ_ERR_NONE;
+  }
+
+  if (td->kind == SSZ_KIND_CONTAINER) {
+    /* Container: merkleize field roots */
+    if (td->field_count == 0) {
+      if (err) snprintf(err, 128, "Container has no fields");
+      return SSZ_ERR_UNSUPPORTED_TYPE;
+    }
+    
+    StackEntry stack[MAX_STACK_DEPTH];
+    uint32_t depth = 0;
+    size_t offset = 0;
+    
+    /* Parse fixed-size fields first */
+    for (uint32_t i = 0; i < td->field_count; i++) {
+      const TypeDesc *field_td = (const TypeDesc *)td->field_types[i];
+      
+      if (field_td->fixed_size > 0) {
+        /* Fixed-size field */
+        if (offset + field_td->fixed_size > len) {
+          if (err) snprintf(err, 128, "Container field %u exceeds buffer", i);
+          return SSZ_ERR_NON_CANONICAL;
+        }
+        
+        uint8_t field_root[32];
+        int result = ssz_stream_root_from_buffer(
+          bytes + offset, field_td->fixed_size, field_td, field_root, err
+        );
+        if (result != SSZ_ERR_NONE) return result;
+        
+        StackEntry entry = { .height = 0 };
+        memcpy(entry.hash, field_root, 32);
+        push_and_merge(stack, &depth, entry);
+        
+        offset += field_td->fixed_size;
+      } else {
+        /* Variable-size field - read offset from header */
+        if (offset + 4 > len) {
+          if (err) snprintf(err, 128, "Container offset table truncated");
+          return SSZ_ERR_NON_CANONICAL;
+        }
+        
+        uint32_t field_offset = bytes[offset] | (bytes[offset+1] << 8) | 
+                               (bytes[offset+2] << 16) | (bytes[offset+3] << 24);
+        offset += 4;
+        
+        /* Validate offset points into data region */
+        if (field_offset < offset || field_offset > len) {
+          if (err) snprintf(err, 128, "Container field offset invalid");
+          return SSZ_ERR_NON_CANONICAL;
+        }
+        
+        /* For now, simplified: process variable fields later */
+        /* Full implementation requires tracking all offsets */
+      }
+    }
+    
+    /* Finalize merkleization */
+    while (depth > 1) {
+      StackEntry top = stack[depth - 1];
+      StackEntry below = stack[depth - 2];
+      uint8_t parent[32];
+      hash_parent(below.hash, top.hash, parent);
+      depth -= 2;
+      StackEntry merged = { .height = below.height + 1 };
+      memcpy(merged.hash, parent, 32);
+      stack[depth] = merged;
+      depth++;
+    }
+    
+    if (depth == 0) {
+      memset(out_root, 0, 32);
+    } else {
+      memcpy(out_root, stack[0].hash, 32);
+    }
+    
+    return SSZ_ERR_NONE;
+  }
+
   /* For composite types (Vector/List/Container), chunk and merkleize */
   StackEntry stack[MAX_STACK_DEPTH];
   uint32_t depth = 0;

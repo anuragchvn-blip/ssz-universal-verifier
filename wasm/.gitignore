@@ -1,0 +1,23 @@
+# WASM build outputs
+pkg/
+pkg-*/
+target/
+
+# Node modules
+node_modules/
+package-lock.json
+
+# Build artifacts
+*.wasm
+*.wasm.map
+*.js
+*.d.ts
+!build.js
+!build.ps1
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

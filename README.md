@@ -1,5 +1,10 @@
 # SSZ Universal Verifier Workspace
 
+[![CI](https://github.com/YOUR_USERNAME/ssz-universal-verifier/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/ssz-universal-verifier/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![Rust](https://img.shields.io/badge/Rust-stable-orange.svg)](https://www.rust-lang.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 **Production-grade, deterministic streaming SSZ verifier primitive**
 
 Minimal, auditable implementation of streaming 32-byte chunk producer + incremental merkleizer with strict SSZ canonical checks. Designed for correctness, portability, and determinism across TypeScript, C, Rust, WASM, and RISC-V targets.
@@ -8,6 +13,9 @@ Minimal, auditable implementation of streaming 32-byte chunk producer + incremen
 
 - **[API Reference](docs/API.md)** - Complete API documentation for TypeScript, Rust, and C
 - **[Integration Guide](docs/INTEGRATION.md)** - Quick start and best practices for integrating the verifier
+- **[WebAssembly Guide](docs/WASM.md)** - WASM build, deployment, and usage guide
+- **[CI/CD Pipeline](docs/CICD.md)** - Comprehensive CI/CD documentation and troubleshooting guide
+- **[CI/CD Setup Summary](docs/CICD-SETUP-SUMMARY.md)** - Quick overview of the automated pipeline
 
 ## Purpose
 
@@ -71,13 +79,28 @@ make riscv-build  # Cross-compile to RISC-V (requires toolchain)
 
 ### WASM build
 
-TypeScript to WASM compilation requires additional tooling. Options:
+Compile Rust implementation to WebAssembly for browser and Node.js:
 
-1. **AssemblyScript**: Port TypeScript implementation to AssemblyScript
-2. **Rust WASM**: Expand Rust skeleton and compile with `wasm-pack`
-3. **Manual**: Use `tsc` + `wasm-opt` pipeline
+```bash
+# Build WASM for web (ES modules)
+npm run build:wasm
 
-Placeholder: `npm run build:wasm` (implement based on chosen path)
+# Build for all targets (web, nodejs, bundler)
+npm run build:wasm:all
+
+# Run WASM tests
+npm run test:wasm
+
+# Serve demo in browser
+npm run serve:wasm
+# Then open http://localhost:8080/demo.html
+```
+
+**Output**: ~50-100KB optimized WASM binary with TypeScript definitions
+
+**Requirements**: `wasm-pack` (install: `cargo install wasm-pack`)
+
+See **[docs/WASM.md](docs/WASM.md)** for complete documentation, examples, and deployment guide.
 
 ### RISC-V cross-compilation
 

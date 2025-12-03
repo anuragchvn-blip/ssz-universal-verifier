@@ -62,57 +62,48 @@ int ssz_stream_root_from_buffer(
   char err[128]
 ) {
   if (td->kind == SSZ_KIND_BASIC) {
-    if (td->fixed_size == 0) {
-       // Variable-length bytes: treat as list of bytes? No, spec says Basic is fixed.
-       // But our TS impl handles fixedSize=0 as variable bytes.
-       // For C, let's assume Basic must be fixed size unless we add logic.
-       // Actually, let's just hash the whole buffer as one chunk if it fits?
-       // No, SSZ basic types are little-endian values.
-       // If fixed_size is 0, we'll assume it's a raw byte buffer (like ByteVector/List).
-       // But strictly, Basic types are uintN/bool.
-       // Let's follow TS: if fixed_size is set, check length.
-       if (len != td->fixed_size) {
-         if (err) snprintf(err, 128, "Basic type length mismatch");
-         return SSZ_ERR_NON_CANONICAL;
-       }
-       // Basic types are leaves directly (no hash_leaf needed if < 32 bytes? No, spec says pack to 32 bytes).
-       // Actually, for Basic types, the value IS the leaf.
-       uint8_t chunk[32] = {0};
-       memcpy(chunk, bytes, len < 32 ? len : 32);
-       // In our TS fix, we removed hashLeaf for basic types.
-       // So we just copy to out_root (padded).
-       memcpy(out_root, chunk, 32);
-       return SSZ_ERR_NONE;
+    /* Basic types (uintN, bool) - validate fixed size and return padded chunk */
+    if (td->fixed_size > 0) {
+      if (len != td->fixed_size) {
+        if (err) snprintf(err, 128, "Basic type length mismatch: expected %u, got %zu", td->fixed_size, len);
+        return SSZ_ERR_NON_CANONICAL;
+      }
     }
+    /* SSZ Basic types: the serialized bytes ARE the merkle leaf (zero-padded to 32 bytes) */
+    uint8_t chunk[32] = {0};
+    size_t copy_len = (len < 32) ? len : 32;
+    memcpy(chunk, bytes, copy_len);
+    memcpy(out_root, chunk, 32);
+    return SSZ_ERR_NONE;
   }
 
-  // For other types, we need to chunk and merkleize
+  /* For composite types (Vector/List/Container), chunk and merkleize */
   StackEntry stack[MAX_STACK_DEPTH];
   uint32_t depth = 0;
   
-  // Simple chunker for now: assume packed bytes (Vector/List of basic)
-  // This is a simplification. Real SSZ has complex packing.
-  // We will implement a simple chunker for packed data.
+  /* Calculate element count and chunk size based on type */
+  size_t elem_size = 1; /* Default: byte elements */
+  size_t elem_count = len;
   
+  if (td->element_type != NULL) {
+    const TypeDesc *elem_td = (const TypeDesc *)td->element_type;
+    if (elem_td->fixed_size > 0) {
+      elem_size = elem_td->fixed_size;
+      elem_count = len / elem_size;
+    }
+  }
+  
+  /* Chunk data: pack elements into 32-byte chunks */
   size_t offset = 0;
   size_t chunk_count = 0;
   
   while (offset < len) {
     uint8_t chunk[32] = {0};
     size_t remain = len - offset;
-    size_t copy = remain < 32 ? remain : 32;
+    size_t copy = (remain < 32) ? remain : 32;
     memcpy(chunk, bytes + offset, copy);
     
-    // For packed data, we hash the chunk to get the leaf
-    // Wait, for Vector/List of Basic, the chunks ARE the leaves?
-    // No, for composite types, the leaves are H(chunk).
-    // Let's check TS:
-    // pushAndMerge(stack, { hash: item, height: 0 });
-    // And item comes from streamChunksFromSlice which yields 32-byte chunks.
-    // So we do NOT hash the chunk again?
-    // In TS merkle.ts: pushAndMerge(stack, { hash: item, height: 0 });
-    // So yes, the chunk IS the leaf hash.
-    
+    /* SSZ spec: for composite types, chunks ARE the leaf hashes (no additional hashing) */
     StackEntry entry = { .height = 0 };
     memcpy(entry.hash, chunk, 32);
     push_and_merge(stack, &depth, entry);
@@ -121,10 +112,12 @@ int ssz_stream_root_from_buffer(
     chunk_count++;
   }
   
-  // Finalize
+  /* Finalize merkleization */
   if (depth == 0) {
+    /* Empty data: root is zero hash */
     memset(out_root, 0, 32);
   } else {
+    /* Collapse remaining stack entries */
     while (depth > 1) {
       StackEntry top = stack[depth - 1];
       StackEntry below = stack[depth - 2];
@@ -139,14 +132,9 @@ int ssz_stream_root_from_buffer(
     memcpy(out_root, stack[0].hash, 32);
   }
   
-  // Mixin length if needed
+  /* Mix in length for List types (element count, not chunk count) */
   if (td->kind == SSZ_KIND_LIST) {
-    // For List, we mix in the number of elements.
-    // If elements are packed, we need element count, not chunk count.
-    // But for now, let's assume packed bytes (List<uint8>).
-    // If element_type is provided, we can calc count.
-    // This C impl is minimal.
-    mixin_length(out_root, chunk_count); // This is wrong for non-byte lists
+    mixin_length(out_root, (uint32_t)elem_count);
   }
   
   return SSZ_ERR_NONE;

@@ -13,11 +13,28 @@
     "test:extended": "node dist/tests/extended-vectors.js",
     "test:all": "npm run test:basic && npm run test:extended",
     "bench": "node dist/tests/benchmarks.js",
+    "bench:advanced": "tsc && node dist/tests/benchmarks-advanced.js",
+    "bench:direct": "tsc && node dist/tests/direct-benchmark.js",
+    "bench:aggressive": "tsc && node dist/tests/aggressive-bench.js",
+    "bench:throughput": "tsc && node dist/src/merkle-optimized.js",
+    "bench:parallel": "tsc && node dist/src/merkle-parallel.js",
+    "bench:native": "npm run build:native && tsc && node dist/tests/bench-native.js",
+    "build:native": "cd native && npm install && npm run build",
     "cli": "node bin/ssz-verify.js",
-    "build:wasm": "echo 'WASM build: use AssemblyScript or tsc + wasm-opt. See README for manual steps.'"
+    "build:wasm": "cd wasm && npm run build",
+    "build:wasm:all": "cd wasm && npm run build:all",
+    "build:wasm:web": "cd wasm && npm run build:web",
+    "build:wasm:node": "cd wasm && npm run build:nodejs",
+    "build:wasm:simd": "cd wasm && RUSTFLAGS='-C target-feature=+simd128' wasm-pack build --target web -- --features simd",
+    "test:wasm": "cd wasm && npm test",
+    "serve:wasm": "cd wasm/examples && python -m http.server 8080"
   },
   "devDependencies": {
+    "@chainsafe/ssz": "^1.3.0",
     "@types/node": "^24.10.1",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@chainsafe/as-sha256": "^1.2.0"
   }
 }

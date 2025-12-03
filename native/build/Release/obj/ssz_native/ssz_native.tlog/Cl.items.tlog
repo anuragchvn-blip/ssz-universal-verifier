@@ -1,0 +1,4 @@
+C:\Users\Windows\ssz-universal-verifier\native\src\sha256_native.cc;C:\Users\Windows\ssz-universal-verifier\native\build\Release\obj\ssz_native\src\sha256_native.obj
+C:\Users\Windows\ssz-universal-verifier\native\src\sha256_fallback.cc;C:\Users\Windows\ssz-universal-verifier\native\build\Release\obj\ssz_native\src\sha256_fallback.obj
+C:\Users\Windows\ssz-universal-verifier\native\src\addon.cc;C:\Users\Windows\ssz-universal-verifier\native\build\Release\obj\ssz_native\src\addon.obj
+C:\Users\Windows\ssz-universal-verifier\native\node_modules\node-gyp\src\win_delay_load_hook.cc;C:\Users\Windows\ssz-universal-verifier\native\build\Release\obj\ssz_native\win_delay_load_hook.obj

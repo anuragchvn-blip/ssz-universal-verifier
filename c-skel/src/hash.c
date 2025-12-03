@@ -34,27 +34,7 @@ void sha256_hash(const uint8_t *data, size_t len, uint8_t out[32]) {
   size_t offset = 0;
   size_t total_bits = len * 8;
   
-  while (offset < len + 9 || (offset % 64) != 0) {
-    memset(block, 0, 64);
-    if (offset < len) {
-      size_t copy = len - offset;
-      if (copy > 64) copy = 64;
-      memcpy(block, data + offset, copy);
-      if (copy < 64) block[copy] = 0x80;
-    } else if (offset == len) {
-      block[0] = 0x80;
-    }
-    
-    // Padding length
-    if ((offset + 64) > len + 9 && (offset % 64) == 0) {
-       // Last block with length
-       // If we are here, we are padding
-    }
-    
-    // This loop structure is tricky for single pass.
-    // Let's simplify: process full blocks, then pad.
-    break; 
-  }
+  // Removed: confusing padding logic replaced with clean two-phase approach below
   
   // Re-implement simpler flow
   offset = 0;

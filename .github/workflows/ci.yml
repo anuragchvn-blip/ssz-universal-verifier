@@ -19,7 +19,7 @@ jobs:
     name: Lint & Format Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -59,7 +59,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node: ['18.x', '20.x', '22.x']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -90,7 +90,7 @@ jobs:
       matrix:
         rust: [stable, beta, nightly]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
@@ -137,7 +137,7 @@ jobs:
       matrix:
         compiler: ['gcc', 'clang']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Install dependencies
         run: |
@@ -171,7 +171,7 @@ jobs:
     name: WASM Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -207,7 +207,7 @@ jobs:
     name: Security Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Run npm audit
         run: npm audit --audit-level=moderate || echo "::warning::npm vulnerabilities found"
@@ -230,7 +230,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [typescript, rust, c]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Setup Node.js
         uses: actions/setup-node@v4

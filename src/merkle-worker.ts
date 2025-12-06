@@ -19,7 +19,7 @@ function computeRoot(chunks: Uint8Array[]): Uint8Array {
 
   while (currentLevel.length > 1) {
     const nextLevel: Uint8Array[] = [];
-    
+
     let i = 0;
     while (i + 7 < currentLevel.length) {
       const batch: Uint8Array[] = [];
@@ -29,7 +29,7 @@ function computeRoot(chunks: Uint8Array[]): Uint8Array {
         combined.set(currentLevel[i + j * 2 + 1], 32);
         batch.push(combined);
       }
-      
+
       for (const combined of batch) {
         const left = combined.subarray(0, 32);
         const right = combined.subarray(32, 64);
@@ -37,17 +37,17 @@ function computeRoot(chunks: Uint8Array[]): Uint8Array {
       }
       i += 8;
     }
-    
+
     while (i + 1 < currentLevel.length) {
       const parent = hashParent(currentLevel[i], currentLevel[i + 1]);
       nextLevel.push(parent);
       i += 2;
     }
-    
+
     if (i < currentLevel.length) {
       nextLevel.push(currentLevel[i]);
     }
-    
+
     currentLevel = nextLevel;
   }
 

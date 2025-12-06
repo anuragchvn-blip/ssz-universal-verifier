@@ -21,7 +21,7 @@ export function computeRootFromChunksOptimized(chunks: Uint8Array[]): Uint8Array
 
   while (currentLevel.length > 1) {
     const nextLevel: Uint8Array[] = [];
-    
+
     // Process in batches of 4 pairs (8 nodes) for optimal SIMD performance
     let i = 0;
     while (i + 7 < currentLevel.length) {
@@ -35,7 +35,7 @@ export function computeRootFromChunksOptimized(chunks: Uint8Array[]): Uint8Array
         combined.set(right, 32);
         batch.push(combined);
       }
-      
+
       // Hash 4 parent nodes
       for (const combined of batch) {
         const left = combined.subarray(0, 32);
@@ -44,19 +44,19 @@ export function computeRootFromChunksOptimized(chunks: Uint8Array[]): Uint8Array
       }
       i += 8;
     }
-    
+
     // Process remaining pairs individually
     while (i + 1 < currentLevel.length) {
       const parent = hashParent(currentLevel[i], currentLevel[i + 1]);
       nextLevel.push(parent);
       i += 2;
     }
-    
+
     // Handle odd number of nodes
     if (i < currentLevel.length) {
       nextLevel.push(currentLevel[i]);
     }
-    
+
     currentLevel = nextLevel;
   }
 
@@ -90,28 +90,32 @@ export function benchmarkMerkleizationThroughput() {
 
   for (const { size, iterations } of testCases) {
     const chunks = Array.from({ length: size }, () => generateChunk());
-    
+
     // Calculate total hash operations needed for complete merkleization
     // For a tree with N leaves, we need N-1 parent hashes to reach the root
     const hashOpsPerMerkleization = size - 1;
-    
+
     // Benchmark
     const start = performance.now();
     for (let i = 0; i < iterations; i++) {
       computeRootFromChunksOptimized(chunks);
     }
     const elapsed = (performance.now() - start) / 1000;
-    
+
     const merkleizationsPerSec = iterations / elapsed;
     const totalHashOpsPerSec = merkleizationsPerSec * hashOpsPerMerkleization;
-    
+
     console.log(`Tree size: ${size} leaves`);
-    console.log(`  Merkleizations/sec: ${merkleizationsPerSec.toLocaleString('en-US', { maximumFractionDigits: 0 })}`);
+    console.log(
+      `  Merkleizations/sec: ${merkleizationsPerSec.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+    );
     console.log(`  Hash ops/merkleization: ${hashOpsPerMerkleization}`);
     console.log(`  Total hash ops/sec: ${(totalHashOpsPerSec / 1000000).toFixed(2)}M`);
-    console.log(`  ${totalHashOpsPerSec >= 3000000 ? '✅ TARGET MET (3M+)' : '⚠️  Below 3M target'}\n`);
+    console.log(
+      `  ${totalHashOpsPerSec >= 3000000 ? '✅ TARGET MET (3M+)' : '⚠️  Below 3M target'}\n`
+    );
   }
-  
+
   console.log('═══════════════════════════════════════════════════════════');
   console.log('Note: "Hash operations per second" = merkleizations/sec × (N-1)');
   console.log('This is the industry-standard metric for merkleization throughput.');

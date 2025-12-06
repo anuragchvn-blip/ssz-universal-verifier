@@ -1,4 +1,10 @@
-import { sszStreamRootFromSlice, sszStreamRootFromReader, TypeDesc, TypeKind, SszError } from '../src/index.js';
+import {
+  sszStreamRootFromSlice,
+  sszStreamRootFromReader,
+  TypeDesc,
+  TypeKind,
+  SszError,
+} from '../src/index.js';
 
 /* Canonical and negative test vectors: deterministic, no external deps */
 
@@ -15,7 +21,9 @@ function assert(cond: boolean, msg: string): void {
 }
 
 function hex(buf: Uint8Array): string {
-  return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(buf)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 function fromHex(s: string): Uint8Array {
@@ -39,7 +47,10 @@ const listBytes32: TypeDesc = { kind: TypeKind.List, elementType: bytes32Type };
   assert('root' in res, 'uint64(0) should succeed');
   if ('root' in res) {
     const expected = '0000000000000000000000000000000000000000000000000000000000000000';
-    assert(hex(res.root) === expected, `uint64(0) root: expected ${expected}, got ${hex(res.root)}`);
+    assert(
+      hex(res.root) === expected,
+      `uint64(0) root: expected ${expected}, got ${hex(res.root)}`
+    );
   }
 }
 
@@ -50,7 +61,10 @@ const listBytes32: TypeDesc = { kind: TypeKind.List, elementType: bytes32Type };
   assert('root' in res, 'bytes32 zero should succeed');
   if ('root' in res) {
     const expected = '0000000000000000000000000000000000000000000000000000000000000000';
-    assert(hex(res.root) === expected, `bytes32 zero root: expected ${expected}, got ${hex(res.root)}`);
+    assert(
+      hex(res.root) === expected,
+      `bytes32 zero root: expected ${expected}, got ${hex(res.root)}`
+    );
   }
 }
 
@@ -86,8 +100,8 @@ const listBytes32: TypeDesc = { kind: TypeKind.List, elementType: bytes32Type };
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 8 },
       { kind: TypeKind.Basic, fixedSize: 8 },
-      { kind: TypeKind.Basic, fixedSize: 0 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 0 },
+    ],
   };
   const field1 = new Uint8Array(8);
   field1[0] = 0x01;
@@ -129,9 +143,12 @@ const listBytes32: TypeDesc = { kind: TypeKind.List, elementType: bytes32Type };
 // Test 8: list<uint64> with 2 elements
 {
   const offsets = new Uint8Array(8);
-  offsets[0] = 8; offsets[4] = 16;
-  const elem1 = new Uint8Array(8); elem1[0] = 1;
-  const elem2 = new Uint8Array(8); elem2[0] = 2;
+  offsets[0] = 8;
+  offsets[4] = 16;
+  const elem1 = new Uint8Array(8);
+  elem1[0] = 1;
+  const elem2 = new Uint8Array(8);
+  elem2[0] = 2;
   const data = new Uint8Array(24);
   data.set(offsets, 0);
   data.set(elem1, 8);
@@ -144,7 +161,8 @@ const listBytes32: TypeDesc = { kind: TypeKind.List, elementType: bytes32Type };
 {
   const vectorType: TypeDesc = { kind: TypeKind.Vector, elementType: uint64Zero };
   const data = new Uint8Array(16);
-  data[0] = 1; data[8] = 2;
+  data[0] = 1;
+  data[8] = 2;
   const res = sszStreamRootFromSlice(vectorType, data);
   assert('root' in res, 'vector<uint64,2> should succeed');
 }
@@ -177,7 +195,10 @@ const listBytes32: TypeDesc = { kind: TypeKind.List, elementType: bytes32Type };
   const bitlistType: TypeDesc = { kind: TypeKind.Bitlist };
   const data = fromHex('3f');
   const res = sszStreamRootFromSlice(bitlistType, data);
-  assert('error' in res && res.error === SszError.BitlistPadding, 'bitlist non-zero padding should fail');
+  assert(
+    'error' in res && res.error === SszError.BitlistPadding,
+    'bitlist non-zero padding should fail'
+  );
 }
 
 // Test 12: container with non-increasing offsets
@@ -187,12 +208,14 @@ const listBytes32: TypeDesc = { kind: TypeKind.List, elementType: bytes32Type };
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 8 },
       { kind: TypeKind.Basic, fixedSize: 0 },
-      { kind: TypeKind.Basic, fixedSize: 0 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 0 },
+    ],
   };
   const field1 = new Uint8Array(8);
-  const offset1 = new Uint8Array(4); offset1[0] = 20;
-  const offset2 = new Uint8Array(4); offset2[0] = 18;
+  const offset1 = new Uint8Array(4);
+  offset1[0] = 20;
+  const offset2 = new Uint8Array(4);
+  offset2[0] = 18;
   const data = new Uint8Array(20);
   data.set(field1, 0);
   data.set(offset1, 8);
@@ -210,11 +233,17 @@ const listBytes32: TypeDesc = { kind: TypeKind.List, elementType: bytes32Type };
 
 // Test 14: offset points outside buffer
 {
-  const listVarBytes: TypeDesc = { kind: TypeKind.List, elementType: { kind: TypeKind.Basic, fixedSize: 0 } };
+  const listVarBytes: TypeDesc = {
+    kind: TypeKind.List,
+    elementType: { kind: TypeKind.Basic, fixedSize: 0 },
+  };
   const offsets = new Uint8Array(4);
   offsets[0] = 100;
   const res = sszStreamRootFromSlice(listVarBytes, offsets);
-  assert('error' in res && res.error === SszError.BadOffset, 'offset beyond buffer should fail (misalignment)');
+  assert(
+    'error' in res && res.error === SszError.BadOffset,
+    'offset beyond buffer should fail (misalignment)'
+  );
 }
 
 // Test 15: empty bitlist
@@ -227,7 +256,10 @@ const listBytes32: TypeDesc = { kind: TypeKind.List, elementType: bytes32Type };
 
 // Test 16: list with malformed header (not enough data)
 {
-  const listVarBytes: TypeDesc = { kind: TypeKind.List, elementType: { kind: TypeKind.Basic, fixedSize: 0 } };
+  const listVarBytes: TypeDesc = {
+    kind: TypeKind.List,
+    elementType: { kind: TypeKind.Basic, fixedSize: 0 },
+  };
   const data = new Uint8Array(2);
   const res = sszStreamRootFromSlice(listVarBytes, data);
   assert('error' in res && res.error === SszError.MalformedHeader, 'malformed header should fail');
@@ -247,13 +279,16 @@ const listBytes32: TypeDesc = { kind: TypeKind.List, elementType: bytes32Type };
     kind: TypeKind.Container,
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 8 },
-      { kind: TypeKind.Basic, fixedSize: 8 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 8 },
+    ],
   };
   const data = new Uint8Array(10);
   const res = sszStreamRootFromSlice(containerType, data);
 
-  assert('error' in res && res.error === SszError.MalformedHeader, 'container too short should fail');
+  assert(
+    'error' in res && res.error === SszError.MalformedHeader,
+    'container too short should fail'
+  );
 }
 
 // Test 19: list<bytes32> trailing bytes

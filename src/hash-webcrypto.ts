@@ -42,7 +42,10 @@ export async function hashLeafAsync(chunk32: Uint8Array): Promise<Uint8Array> {
  * Async WebCrypto SHA-256 for parent node (64 bytes)
  * ~5-10x faster than pure TypeScript implementation
  */
-export async function hashParentAsync(left32: Uint8Array, right32: Uint8Array): Promise<Uint8Array> {
+export async function hashParentAsync(
+  left32: Uint8Array,
+  right32: Uint8Array
+): Promise<Uint8Array> {
   if (!hasWebCrypto) {
     throw new Error('WebCrypto not available');
   }
@@ -74,7 +77,7 @@ export async function computeRootFromChunksAsync(chunks: Uint8Array[]): Promise<
   if (!hasWebCrypto) {
     throw new Error('WebCrypto not available');
   }
-  
+
   if (chunks.length === 0) {
     return new Uint8Array(32); // Zero hash
   }
@@ -89,16 +92,16 @@ export async function computeRootFromChunksAsync(chunks: Uint8Array[]): Promise<
   for (const chunk of chunks) {
     let node = chunk;
     let h = 0;
-    
+
     while (h < height && stack.length > 0) {
       const stackHeight = stack.length - 1;
       if (stackHeight !== h) break;
-      
+
       const left = stack.pop()!;
       node = await hashParentAsync(left, node);
       h++;
     }
-    
+
     stack.push(node);
     if (h >= height) {
       height = h + 1;

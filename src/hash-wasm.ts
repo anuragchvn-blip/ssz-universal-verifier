@@ -48,16 +48,16 @@ export function computeRootFromChunksWasm(chunks: Uint8Array[]): Uint8Array {
   for (const chunk of chunks) {
     let node = chunk;
     let h = 0;
-    
+
     while (h < height && stack.length > 0) {
       const stackHeight = stack.length - 1;
       if (stackHeight !== h) break;
-      
+
       const left = stack.pop()!;
       node = hashParentWasm(left, node);
       h++;
     }
-    
+
     stack.push(node);
     if (h >= height) {
       height = h + 1;

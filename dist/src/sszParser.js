@@ -27,7 +27,7 @@ function parseToRanges(td, bytes) {
             bitLen++;
             sentinel >>= 1;
         }
-        const paddingBits = (bytes.length * 8) - bitLen - 1;
+        const paddingBits = bytes.length * 8 - bitLen - 1;
         // Fix: prevent overflow for paddingBits >= 31
         if (paddingBits >= 31)
             return { ranges: [], error: types_js_1.SszError.BitlistPadding, msg: 'Bitlist padding overflow' };
@@ -38,12 +38,20 @@ function parseToRanges(td, bytes) {
     }
     if (td.kind === types_js_1.TypeKind.List || td.kind === types_js_1.TypeKind.Vector) {
         if (!td.elementType)
-            return { ranges: [], error: types_js_1.SszError.UnsupportedType, msg: 'List/Vector missing elementType' };
+            return {
+                ranges: [],
+                error: types_js_1.SszError.UnsupportedType,
+                msg: 'List/Vector missing elementType',
+            };
         const eleFixed = td.elementType.fixedSize;
         if (eleFixed !== undefined && eleFixed > 0) {
             const count = bytes.length / eleFixed;
             if (!Number.isInteger(count))
-                return { ranges: [], error: types_js_1.SszError.NonCanonical, msg: 'List fixed-size element misalignment' };
+                return {
+                    ranges: [],
+                    error: types_js_1.SszError.NonCanonical,
+                    msg: 'List fixed-size element misalignment',
+                };
             const ranges = [];
             for (let i = 0; i < count; i++) {
                 ranges.push({ start: i * eleFixed, end: (i + 1) * eleFixed });
@@ -57,8 +65,8 @@ function parseToRanges(td, bytes) {
     if (td.kind === types_js_1.TypeKind.Container) {
         if (!td.fieldTypes || td.fieldTypes.length === 0)
             return { ranges: [{ start: 0, end: bytes.length }], error: types_js_1.SszError.None, msg: '' };
-        const fixedFields = td.fieldTypes.map(ft => ft.fixedSize !== undefined && ft.fixedSize > 0);
-        const varCount = fixedFields.filter(f => !f).length;
+        const fixedFields = td.fieldTypes.map((ft) => ft.fixedSize !== undefined && ft.fixedSize > 0);
+        const varCount = fixedFields.filter((f) => !f).length;
         if (varCount === 0) {
             let totalFixedSize = 0;
             for (const ft of td.fieldTypes)
@@ -84,7 +92,11 @@ function parseToRanges(td, bytes) {
 }
 function parseVariableList(bytes) {
     if (bytes.length < 4)
-        return { ranges: [], error: types_js_1.SszError.MalformedHeader, msg: 'Variable list too short for offsets' };
+        return {
+            ranges: [],
+            error: types_js_1.SszError.MalformedHeader,
+            msg: 'Variable list too short for offsets',
+        };
     const offsets = [];
     let i = 0;
     while (i + 4 <= bytes.length) {
@@ -174,6 +186,10 @@ function parseVariableContainer(td, bytes, fixedFields) {
 }
 function readU32LE(bytes, offset) {
     // Fix: use unsigned right-shift to prevent sign extension and ensure result is non-negative
-    return (bytes[offset] | (bytes[offset + 1] << 8) | (bytes[offset + 2] << 16) | (bytes[offset + 3] << 24)) >>> 0;
+    return ((bytes[offset] |
+        (bytes[offset + 1] << 8) |
+        (bytes[offset + 2] << 16) |
+        (bytes[offset + 3] << 24)) >>>
+        0);
 }
 //# sourceMappingURL=sszParser.js.map

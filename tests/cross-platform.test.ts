@@ -1,11 +1,11 @@
 /**
  * Cross-Platform Determinism Tests
- * 
+ *
  * Verifies that TypeScript implementation produces DETERMINISTIC roots:
  * - Same input always produces same output
  * - Different buffer instances with same content produce same root
  * - Multiple calls produce identical results
- * 
+ *
  * Future: Add C and Rust implementation comparisons when binaries are ready
  */
 
@@ -24,7 +24,9 @@ function assert(cond: boolean, msg: string): void {
 }
 
 function hex(buf: Uint8Array): string {
-  return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(buf)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 console.log('=== Cross-Platform Determinism Tests ===\n');
@@ -41,7 +43,7 @@ const listUint64: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
   console.log('Test 1: Determinism over repeated calls');
   const data = new Uint8Array([42, 0, 0, 0, 0, 0, 0, 0]);
   const roots: string[] = [];
-  
+
   for (let i = 0; i < 100; i++) {
     const res = sszStreamRootFromSlice(uint64Type, data);
     assert('root' in res, `Iteration ${i} should succeed`);
@@ -49,10 +51,12 @@ const listUint64: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
       roots.push(hex(res.root));
     }
   }
-  
+
   const uniqueRoots = new Set(roots);
-  assert(uniqueRoots.size === 1, 
-    `100 calls must produce identical root. Got ${uniqueRoots.size} unique roots`);
+  assert(
+    uniqueRoots.size === 1,
+    `100 calls must produce identical root. Got ${uniqueRoots.size} unique roots`
+  );
   console.log(`  ✓ 100 calls produced identical root: ${roots[0]}`);
 }
 
@@ -63,19 +67,20 @@ const listUint64: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
   const data2 = new Uint8Array([42, 0, 0, 0, 0, 0, 0, 0]);
   const data3 = new Uint8Array(8);
   data3[0] = 42; // Different construction method
-  
+
   const res1 = sszStreamRootFromSlice(uint64Type, data1);
   const res2 = sszStreamRootFromSlice(uint64Type, data2);
   const res3 = sszStreamRootFromSlice(uint64Type, data3);
-  
-  assert('root' in res1 && 'root' in res2 && 'root' in res3, 
-    'All buffer instances should succeed');
+
+  assert('root' in res1 && 'root' in res2 && 'root' in res3, 'All buffer instances should succeed');
   if ('root' in res1 && 'root' in res2 && 'root' in res3) {
     const root1 = hex(res1.root);
     const root2 = hex(res2.root);
     const root3 = hex(res3.root);
-    assert(root1 === root2 && root2 === root3, 
-      `Different buffers with same content must have same root. Got ${root1}, ${root2}, ${root3}`);
+    assert(
+      root1 === root2 && root2 === root3,
+      `Different buffers with same content must have same root. Got ${root1}, ${root2}, ${root3}`
+    );
     console.log(`  ✓ 3 different buffer instances produced identical root: ${root1}`);
   }
 }
@@ -85,18 +90,17 @@ const listUint64: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
   console.log('\nTest 3: Determinism across all basic types');
   const basicTests = [
     { name: 'uint8', type: uint8Type, data: new Uint8Array([0xff]) },
-    { name: 'uint64', type: uint64Type, data: new Uint8Array([1,2,3,4,5,6,7,8]) },
-    { name: 'uint256', type: uint256Type, data: new Uint8Array(32).fill(0xaa) }
+    { name: 'uint64', type: uint64Type, data: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]) },
+    { name: 'uint256', type: uint256Type, data: new Uint8Array(32).fill(0xaa) },
   ];
-  
+
   for (const test of basicTests) {
     const root1 = sszStreamRootFromSlice(test.type, test.data);
     const root2 = sszStreamRootFromSlice(test.type, test.data);
-    
+
     assert('root' in root1 && 'root' in root2, `${test.name} should succeed`);
     if ('root' in root1 && 'root' in root2) {
-      assert(hex(root1.root) === hex(root2.root), 
-        `${test.name} must be deterministic`);
+      assert(hex(root1.root) === hex(root2.root), `${test.name} must be deterministic`);
       console.log(`  ✓ ${test.name}: ${hex(root1.root).substring(0, 16)}...`);
     }
   }
@@ -105,7 +109,7 @@ const listUint64: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
 // Test 4: Lists are deterministic
 {
   console.log('\nTest 4: List determinism');
-  
+
   // Empty list
   const empty1 = sszStreamRootFromSlice(listUint8, new Uint8Array(0));
   const empty2 = sszStreamRootFromSlice(listUint8, new Uint8Array(0));
@@ -114,7 +118,7 @@ const listUint64: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
     assert(hex(empty1.root) === hex(empty2.root), 'Empty lists must be deterministic');
     console.log(`  ✓ Empty list: ${hex(empty1.root).substring(0, 16)}...`);
   }
-  
+
   // Non-empty list
   const data = new Uint8Array([1, 2, 3, 4, 5]);
   const list1 = sszStreamRootFromSlice(listUint8, data);
@@ -140,14 +144,28 @@ const listUint64: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
   console.log('\nTest 6: Container determinism');
   const containerType: TypeDesc = {
     kind: TypeKind.Container,
-    fieldTypes: [uint64Type, uint64Type]
+    fieldTypes: [uint64Type, uint64Type],
   };
-  
+
   const data = new Uint8Array([
-    1, 0, 0, 0, 0, 0, 0, 0,  // First uint64
-    2, 0, 0, 0, 0, 0, 0, 0   // Second uint64
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0, // First uint64
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0, // Second uint64
   ]);
-  
+
   const cont1 = sszStreamRootFromSlice(containerType, data);
   const cont2 = sszStreamRootFromSlice(containerType, data);
   assert('root' in cont1 && 'root' in cont2, 'Containers should succeed');
@@ -161,14 +179,14 @@ const listUint64: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
 {
   console.log('\nTest 7: Large data determinism');
   const largeList: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
-  
+
   // Create 1000 uint64 elements
   const data = new Uint8Array(8000);
   for (let i = 0; i < 1000; i++) {
     data[i * 8] = i & 0xff;
     data[i * 8 + 1] = (i >> 8) & 0xff;
   }
-  
+
   const large1 = sszStreamRootFromSlice(largeList, data);
   const large2 = sszStreamRootFromSlice(largeList, data);
   assert('root' in large1 && 'root' in large2, 'Large lists should succeed');
@@ -181,35 +199,34 @@ const listUint64: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
 // Test 8: Known test vectors match (regression test)
 {
   console.log('\nTest 8: Known test vector roots (regression)');
-  
+
   const vectors = [
     {
       name: 'uint64(0)',
       type: uint64Type,
       data: new Uint8Array(8),
-      expected: '0000000000000000000000000000000000000000000000000000000000000000'
+      expected: '0000000000000000000000000000000000000000000000000000000000000000',
     },
     {
       name: 'uint64(42)',
       type: uint64Type,
       data: new Uint8Array([42, 0, 0, 0, 0, 0, 0, 0]),
-      expected: '2a00000000000000000000000000000000000000000000000000000000000000'
+      expected: '2a00000000000000000000000000000000000000000000000000000000000000',
     },
     {
       name: 'uint256(all 0xff)',
       type: uint256Type,
       data: new Uint8Array(32).fill(0xff),
-      expected: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-    }
+      expected: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+    },
   ];
-  
+
   for (const v of vectors) {
     const res = sszStreamRootFromSlice(v.type, v.data);
     assert('root' in res, `${v.name} should succeed`);
     if ('root' in res) {
       const root = hex(res.root);
-      assert(root === v.expected, 
-        `${v.name} root mismatch. Expected ${v.expected}, got ${root}`);
+      assert(root === v.expected, `${v.name} root mismatch. Expected ${v.expected}, got ${root}`);
       console.log(`  ✓ ${v.name}: ${root.substring(0, 16)}...`);
     }
   }

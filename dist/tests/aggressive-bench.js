@@ -75,7 +75,7 @@ for (let i = 0; i < ITERATIONS; i++) {
 elapsed = (performance.now() - start) / 1000;
 ops = ITERATIONS / elapsed;
 console.log(`  ${(ops / 1000000).toFixed(2)}M ops/sec`);
-console.log(`  Cache impact: ${ops < (ITERATIONS / ((performance.now() - start) / 1000)) ? 'YES' : 'NO'}\n`);
+console.log(`  Cache impact: ${ops < ITERATIONS / ((performance.now() - start) / 1000) ? 'YES' : 'NO'}\n`);
 // Test 3: Batch processing (4 parent nodes at once)
 console.log('Test 3: Batch parent hash (4x 64-byte inputs)');
 const combined1 = new Uint8Array(64);
@@ -134,13 +134,13 @@ for (let i = 0; i < ITERATIONS; i++) {
 elapsed = (performance.now() - start) / 1000;
 ops = ITERATIONS / elapsed;
 console.log(`  ${(ops / 1000000).toFixed(2)}M ops/sec`);
-console.log(`  Zero-allocation parent: ${ops > (ITERATIONS / ((performance.now() - start) / 1000)) ? 'FASTER' : 'SAME'}\n`);
+console.log(`  Zero-allocation parent: ${ops > ITERATIONS / ((performance.now() - start) / 1000) ? 'FASTER' : 'SAME'}\n`);
 // Test 7: Sustained throughput test (30 seconds)
 console.log('Test 7: Sustained throughput (5 second test)');
 const testDuration = 5000; // 5 seconds
 let count = 0;
 start = performance.now();
-while ((performance.now() - start) < testDuration) {
+while (performance.now() - start < testDuration) {
     result = sha256.digest(chunk1);
     count++;
 }

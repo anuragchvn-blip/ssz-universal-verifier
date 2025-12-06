@@ -14,7 +14,9 @@ function assert(cond, msg) {
     }
 }
 function hex(buf) {
-    return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
+    return Array.from(buf)
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
 }
 function fromHex(s) {
     const arr = new Uint8Array(s.length / 2);
@@ -184,8 +186,8 @@ console.log('=== Extended Test Suite: Containers ===\n');
         kind: index_js_1.TypeKind.Container,
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 8 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
+        ],
     };
     const data = new Uint8Array(16);
     data[0] = 0x01;
@@ -201,8 +203,8 @@ console.log('=== Extended Test Suite: Containers ===\n');
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 8 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
+        ],
     };
     const data = new Uint8Array(32);
     for (let i = 0; i < 4; i++)
@@ -216,8 +218,8 @@ console.log('=== Extended Test Suite: Containers ===\n');
         kind: index_js_1.TypeKind.Container,
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
+        ],
     };
     const field1 = new Uint8Array(8);
     field1[0] = 0x42;
@@ -237,8 +239,8 @@ console.log('=== Extended Test Suite: Containers ===\n');
         kind: index_js_1.TypeKind.Container,
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
+        ],
     };
     const offset1 = new Uint8Array(4);
     offset1[0] = 8;
@@ -330,8 +332,8 @@ console.log('\n=== Extended Test Suite: Negative Cases ===\n');
         kind: index_js_1.TypeKind.Container,
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 8 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
+        ],
     };
     const data = new Uint8Array(10); // should be 16
     const res = (0, index_js_1.sszStreamRootFromSlice)(containerType, data);
@@ -343,8 +345,8 @@ console.log('\n=== Extended Test Suite: Negative Cases ===\n');
         kind: index_js_1.TypeKind.Container,
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
+        ],
     };
     const data = new Uint8Array(12);
     data[8] = 4; // offset points into header area
@@ -357,8 +359,8 @@ console.log('\n=== Extended Test Suite: Negative Cases ===\n');
         kind: index_js_1.TypeKind.Container,
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
+        ],
     };
     const data = new Uint8Array(12);
     data[8] = 100; // offset beyond buffer

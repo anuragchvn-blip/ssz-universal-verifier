@@ -10,9 +10,9 @@ interface StackEntry {
 }
 
 export function computeRootFromChunks(
-  chunkGen: Generator<Uint8Array | { error: SszError, msg: string }>,
+  chunkGen: Generator<Uint8Array | { error: SszError; msg: string }>,
   mixinLength?: number
-): { root: Uint8Array } | { error: SszError, msg: string } {
+): { root: Uint8Array } | { error: SszError; msg: string } {
   const stack: StackEntry[] = [];
   let count = 0;
 

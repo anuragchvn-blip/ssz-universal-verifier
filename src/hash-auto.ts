@@ -11,7 +11,7 @@ try {
   hashImpl = {
     hashLeaf: native.hashLeaf,
     hashParent: native.hashParent,
-    info: `Native: ${native.getImplementation()} (${native.hasNativeSupport() ? 'Hardware accelerated' : 'Software fallback'})`
+    info: `Native: ${native.getImplementation()} (${native.hasNativeSupport() ? 'Hardware accelerated' : 'Software fallback'})`,
   };
   console.log(`✅ Using native SHA-256: ${hashImpl.info}`);
 } catch (nativeError) {
@@ -29,7 +29,7 @@ try {
         if (result.error) throw new Error(result.error);
         return result;
       },
-      info: 'Our WASM with SIMD (from wasm/src/hash_simd.rs)'
+      info: 'Our WASM with SIMD (from wasm/src/hash_simd.rs)',
     };
     console.log(`⚠️  Native addon not available, using WASM fallback`);
   } catch (wasmError) {
@@ -38,7 +38,7 @@ try {
     hashImpl = {
       hashLeaf: pureSHA.hashLeaf,
       hashParent: pureSHA.hashParent,
-      info: 'Pure TypeScript (slowest)'
+      info: 'Pure TypeScript (slowest)',
     };
     console.log(`⚠️  WASM not available, using pure TypeScript (slowest)`);
   }

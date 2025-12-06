@@ -17,7 +17,7 @@ function benchmark(name, iterations, fn) {
         operations: iterations,
         totalMs,
         opsPerSec: Math.round((iterations / totalMs) * 1000),
-        avgMs: totalMs / iterations
+        avgMs: totalMs / iterations,
     };
 }
 function printResult(result) {
@@ -103,8 +103,8 @@ console.log('--- Containers ---\n');
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 32 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 32 },
+        ],
     };
     const data = new Uint8Array(48);
     data[0] = 0x01;
@@ -122,8 +122,8 @@ console.log('--- Containers ---\n');
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
+        ],
     };
     const field1 = new Uint8Array(8);
     field1[0] = 0x01;

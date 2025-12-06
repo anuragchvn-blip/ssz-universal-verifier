@@ -14,7 +14,9 @@ function assert(cond, msg) {
     }
 }
 function hex(buf) {
-    return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
+    return Array.from(buf)
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
 }
 function fromHex(s) {
     const arr = new Uint8Array(s.length / 2);
@@ -77,8 +79,8 @@ const listBytes32 = { kind: index_js_1.TypeKind.List, elementType: bytes32Type }
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
+        ],
     };
     const field1 = new Uint8Array(8);
     field1[0] = 0x01;
@@ -173,8 +175,8 @@ const listBytes32 = { kind: index_js_1.TypeKind.List, elementType: bytes32Type }
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
             { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
+        ],
     };
     const field1 = new Uint8Array(8);
     const offset1 = new Uint8Array(4);
@@ -196,7 +198,10 @@ const listBytes32 = { kind: index_js_1.TypeKind.List, elementType: bytes32Type }
 }
 // Test 14: offset points outside buffer
 {
-    const listVarBytes = { kind: index_js_1.TypeKind.List, elementType: { kind: index_js_1.TypeKind.Basic, fixedSize: 0 } };
+    const listVarBytes = {
+        kind: index_js_1.TypeKind.List,
+        elementType: { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
+    };
     const offsets = new Uint8Array(4);
     offsets[0] = 100;
     const res = (0, index_js_1.sszStreamRootFromSlice)(listVarBytes, offsets);
@@ -211,7 +216,10 @@ const listBytes32 = { kind: index_js_1.TypeKind.List, elementType: bytes32Type }
 }
 // Test 16: list with malformed header (not enough data)
 {
-    const listVarBytes = { kind: index_js_1.TypeKind.List, elementType: { kind: index_js_1.TypeKind.Basic, fixedSize: 0 } };
+    const listVarBytes = {
+        kind: index_js_1.TypeKind.List,
+        elementType: { kind: index_js_1.TypeKind.Basic, fixedSize: 0 },
+    };
     const data = new Uint8Array(2);
     const res = (0, index_js_1.sszStreamRootFromSlice)(listVarBytes, data);
     assert('error' in res && res.error === index_js_1.SszError.MalformedHeader, 'malformed header should fail');
@@ -229,8 +237,8 @@ const listBytes32 = { kind: index_js_1.TypeKind.List, elementType: bytes32Type }
         kind: index_js_1.TypeKind.Container,
         fieldTypes: [
             { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
-            { kind: index_js_1.TypeKind.Basic, fixedSize: 8 }
-        ]
+            { kind: index_js_1.TypeKind.Basic, fixedSize: 8 },
+        ],
     };
     const data = new Uint8Array(10);
     const res = (0, index_js_1.sszStreamRootFromSlice)(containerType, data);

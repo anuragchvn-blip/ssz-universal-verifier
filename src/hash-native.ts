@@ -10,7 +10,7 @@ try {
   // Try to load native addon
   native = require('../native/build/Release/ssz_native.node');
   nativeAvailable = true;
-  
+
   if (native.hasShaExtensions()) {
     console.log(`[SSZ Native] Hardware acceleration: ${native.getImplementationName()}`);
   } else {

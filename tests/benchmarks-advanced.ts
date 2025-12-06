@@ -9,13 +9,13 @@ import {
   hashParentAsync,
   computeRootFromChunksAsync,
   isWebCryptoAvailable,
-  getWebCryptoInfo
+  getWebCryptoInfo,
 } from '../src/hash-webcrypto';
 import {
   hashLeafWasm,
   hashParentWasm,
   computeRootFromChunksWasm,
-  isWasmAvailable
+  isWasmAvailable,
 } from '../src/hash-wasm';
 import { computeRootFromChunks } from '../src/merkle';
 
@@ -53,7 +53,7 @@ function formatThroughput(bytesPerSec: number): string {
 // Benchmark: Pure TypeScript SHA-256
 function benchmarkPureTypeScript(): void {
   console.log('\n=== Pure TypeScript SHA-256 ===');
-  
+
   const chunk1 = generateRandomChunk();
   const chunk2 = generateRandomChunk();
 
@@ -71,7 +71,9 @@ function benchmarkPureTypeScript(): void {
   const opsSingle = BENCH_ITERATIONS / elapsedSingle;
   const throughputSingle = opsSingle * 32;
 
-  console.log(`hashLeaf (32 bytes):   ${formatOpsPerSec(opsSingle)} | ${formatThroughput(throughputSingle)}`);
+  console.log(
+    `hashLeaf (32 bytes):   ${formatOpsPerSec(opsSingle)} | ${formatThroughput(throughputSingle)}`
+  );
 
   // Parent hash benchmark
   const startParent = Date.now();
@@ -82,7 +84,9 @@ function benchmarkPureTypeScript(): void {
   const opsParent = BENCH_ITERATIONS / elapsedParent;
   const throughputParent = opsParent * 64;
 
-  console.log(`hashParent (64 bytes): ${formatOpsPerSec(opsParent)} | ${formatThroughput(throughputParent)}`);
+  console.log(
+    `hashParent (64 bytes): ${formatOpsPerSec(opsParent)} | ${formatThroughput(throughputParent)}`
+  );
 }
 
 // Benchmark: WASM SHA-256 (@chainsafe/as-sha256)
@@ -111,7 +115,9 @@ function benchmarkWasm(): number {
   const opsSingle = BENCH_ITERATIONS / elapsedSingle;
   const throughputSingle = opsSingle * 32;
 
-  console.log(`hashLeafWasm (32 bytes):   ${formatOpsPerSec(opsSingle)} | ${formatThroughput(throughputSingle)}`);
+  console.log(
+    `hashLeafWasm (32 bytes):   ${formatOpsPerSec(opsSingle)} | ${formatThroughput(throughputSingle)}`
+  );
 
   // Parent hash benchmark
   const startParent = Date.now();
@@ -122,7 +128,9 @@ function benchmarkWasm(): number {
   const opsParent = BENCH_ITERATIONS / elapsedParent;
   const throughputParent = opsParent * 64;
 
-  console.log(`hashParentWasm (64 bytes): ${formatOpsPerSec(opsParent)} | ${formatThroughput(throughputParent)}`);
+  console.log(
+    `hashParentWasm (64 bytes): ${formatOpsPerSec(opsParent)} | ${formatThroughput(throughputParent)}`
+  );
 
   return opsSingle;
 }
@@ -154,7 +162,9 @@ async function benchmarkWebCrypto(): Promise<void> {
   const opsSingle = BENCH_ITERATIONS / elapsedSingle;
   const throughputSingle = opsSingle * 32;
 
-  console.log(`hashLeafAsync (32 bytes):   ${formatOpsPerSec(opsSingle)} | ${formatThroughput(throughputSingle)}`);
+  console.log(
+    `hashLeafAsync (32 bytes):   ${formatOpsPerSec(opsSingle)} | ${formatThroughput(throughputSingle)}`
+  );
 
   // Parent hash benchmark
   const startParent = Date.now();
@@ -165,7 +175,9 @@ async function benchmarkWebCrypto(): Promise<void> {
   const opsParent = BENCH_ITERATIONS / elapsedParent;
   const throughputParent = opsParent * 64;
 
-  console.log(`hashParentAsync (64 bytes): ${formatOpsPerSec(opsParent)} | ${formatThroughput(throughputParent)}`);
+  console.log(
+    `hashParentAsync (64 bytes): ${formatOpsPerSec(opsParent)} | ${formatThroughput(throughputParent)}`
+  );
   console.log('⚠️  Note: WebCrypto is async and has overhead - use WASM instead for production');
 }
 
@@ -203,7 +215,9 @@ async function benchmarkMerkleization(): Promise<void> {
     console.log(`\nBatch size: ${batchSize} chunks (${batchSize * 32} bytes)`);
     console.log(`  Pure TypeScript: ${formatOpsPerSec(opsSync)}`);
     if (opsWasm > 0) {
-      console.log(`  WASM:            ${formatOpsPerSec(opsWasm)} (${(opsWasm / opsSync).toFixed(2)}x)`);
+      console.log(
+        `  WASM:            ${formatOpsPerSec(opsWasm)} (${(opsWasm / opsSync).toFixed(2)}x)`
+      );
     }
   }
 }
@@ -211,24 +225,24 @@ async function benchmarkMerkleization(): Promise<void> {
 // Benchmark: @chainsafe/ssz comparison
 async function benchmarkChainsafe(): Promise<void> {
   console.log('\n=== @chainsafe/ssz Comparison ===');
-  
+
   try {
     // Import @chainsafe/ssz types and merkleization functions
     const ssz = await import('@chainsafe/ssz');
     const sha256 = await import('@chainsafe/as-sha256');
-    
+
     console.log('✓ @chainsafe/ssz found');
     console.log(`SIMD enabled: ${sha256.simdEnabled ? 'YES ✅' : 'NO ❌'}`);
-    
+
     // Test their hash performance directly
     const chunk1 = generateRandomChunk();
     const chunk2 = generateRandomChunk();
-    
+
     // Warmup
     for (let i = 0; i < WARMUP_ITERATIONS; i++) {
       sha256.digest(chunk1);
     }
-    
+
     // Benchmark their digest function
     const start = Date.now();
     for (let i = 0; i < BENCH_ITERATIONS; i++) {
@@ -237,9 +251,11 @@ async function benchmarkChainsafe(): Promise<void> {
     const elapsed = (Date.now() - start) / 1000;
     const ops = BENCH_ITERATIONS / elapsed;
     const throughput = ops * 32;
-    
-    console.log(`@chainsafe/as-sha256 digest: ${formatOpsPerSec(ops)} | ${formatThroughput(throughput)}`);
-    
+
+    console.log(
+      `@chainsafe/as-sha256 digest: ${formatOpsPerSec(ops)} | ${formatThroughput(throughput)}`
+    );
+
     // Benchmark their digest2Bytes32 function
     const start2 = Date.now();
     for (let i = 0; i < BENCH_ITERATIONS; i++) {
@@ -248,16 +264,20 @@ async function benchmarkChainsafe(): Promise<void> {
     const elapsed2 = (Date.now() - start2) / 1000;
     const ops2 = BENCH_ITERATIONS / elapsed2;
     const throughput2 = ops2 * 64;
-    
-    console.log(`@chainsafe/as-sha256 digest2: ${formatOpsPerSec(ops2)} | ${formatThroughput(throughput2)}`);
-    
+
+    console.log(
+      `@chainsafe/as-sha256 digest2: ${formatOpsPerSec(ops2)} | ${formatThroughput(throughput2)}`
+    );
+
     // Try to enable SIMD if not already enabled
     if (!sha256.simdEnabled) {
       console.log('\n🔧 Attempting to enable SIMD...');
       try {
         sha256.reinitializeInstance(true);
-        console.log(`SIMD enabled: ${sha256.simdEnabled ? 'YES ✅' : 'NO ❌ (not supported on this platform)'}`);
-        
+        console.log(
+          `SIMD enabled: ${sha256.simdEnabled ? 'YES ✅' : 'NO ❌ (not supported on this platform)'}`
+        );
+
         if (sha256.simdEnabled) {
           // Re-benchmark with SIMD
           const startSIMD = Date.now();
@@ -266,14 +286,15 @@ async function benchmarkChainsafe(): Promise<void> {
           }
           const elapsedSIMD = (Date.now() - startSIMD) / 1000;
           const opsSIMD = BENCH_ITERATIONS / elapsedSIMD;
-          
-          console.log(`With SIMD: ${formatOpsPerSec(opsSIMD)} (${(opsSIMD / ops).toFixed(2)}x improvement)`);
+
+          console.log(
+            `With SIMD: ${formatOpsPerSec(opsSIMD)} (${(opsSIMD / ops).toFixed(2)}x improvement)`
+          );
         }
       } catch (err) {
         console.log(`❌ Failed to enable SIMD: ${err}`);
       }
     }
-    
   } catch (error) {
     console.log('⚠️  @chainsafe/ssz not installed');
     console.log('   Install with: npm install @chainsafe/ssz');
@@ -284,14 +305,14 @@ async function benchmarkChainsafe(): Promise<void> {
 // Performance target validation
 function validatePerformanceTargets(webCryptoOps: number): void {
   console.log('\n=== Performance Target Validation ===');
-  
+
   const TARGET_OPS = 3000000; // 3M ops/sec minimum
   const STRETCH_TARGET = 5000000; // 5M ops/sec stretch goal (match @chainsafe/ssz)
-  
+
   console.log(`Current:        ${formatOpsPerSec(webCryptoOps)}`);
   console.log(`Minimum Target: ${formatOpsPerSec(TARGET_OPS)}`);
   console.log(`Stretch Goal:   ${formatOpsPerSec(STRETCH_TARGET)}`);
-  
+
   if (webCryptoOps >= STRETCH_TARGET) {
     console.log('✅ STRETCH GOAL ACHIEVED! Performance matches @chainsafe/ssz');
   } else if (webCryptoOps >= TARGET_OPS) {
@@ -299,7 +320,9 @@ function validatePerformanceTargets(webCryptoOps: number): void {
   } else {
     const gap = TARGET_OPS - webCryptoOps;
     const gapPercent = ((TARGET_OPS / webCryptoOps - 1) * 100).toFixed(1);
-    console.log(`❌ TARGET NOT MET: Need ${formatOpsPerSec(gap)} more (${gapPercent}% improvement needed)`);
+    console.log(
+      `❌ TARGET NOT MET: Need ${formatOpsPerSec(gap)} more (${gapPercent}% improvement needed)`
+    );
   }
 }
 
@@ -322,7 +345,7 @@ async function main(): Promise<void> {
   await benchmarkWebCrypto();
   await benchmarkMerkleization();
   await benchmarkChainsafe();
-  
+
   // Validate performance targets
   if (wasmOps > 0) {
     validatePerformanceTargets(wasmOps);

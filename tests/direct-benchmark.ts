@@ -83,9 +83,9 @@ for (let i = 0; i < ITERATIONS / 4; i++) {
   sha256.batchHash4UintArray64s(batch);
 }
 elapsed = (Date.now() - start) / 1000;
-ops = (ITERATIONS / 4 * 4) / elapsed; // 4 hashes per call
+ops = ((ITERATIONS / 4) * 4) / elapsed; // 4 hashes per call
 console.log(`  ${(ops / 1000000).toFixed(2)}M ops/sec\n`);
 
 console.log('=== Conclusion ===');
 console.log('If wrappers are slower, we should use sha256 functions directly.');
-console.log('If we\'re still under 3M ops/sec, the issue is algorithmic, not wrapper overhead.');
+console.log("If we're still under 3M ops/sec, the issue is algorithmic, not wrapper overhead.");

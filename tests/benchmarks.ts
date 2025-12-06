@@ -28,7 +28,7 @@ function benchmark(name: string, iterations: number, fn: () => void): BenchmarkR
     operations: iterations,
     totalMs,
     opsPerSec: Math.round((iterations / totalMs) * 1000),
-    avgMs: totalMs / iterations
+    avgMs: totalMs / iterations,
   };
 }
 
@@ -127,8 +127,8 @@ console.log('--- Containers ---\n');
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 8 },
       { kind: TypeKind.Basic, fixedSize: 8 },
-      { kind: TypeKind.Basic, fixedSize: 32 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 32 },
+    ],
   };
   const data = new Uint8Array(48);
   data[0] = 0x01;
@@ -147,8 +147,8 @@ console.log('--- Containers ---\n');
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 8 },
       { kind: TypeKind.Basic, fixedSize: 8 },
-      { kind: TypeKind.Basic, fixedSize: 0 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 0 },
+    ],
   };
   const field1 = new Uint8Array(8);
   field1[0] = 0x01;
@@ -163,7 +163,7 @@ console.log('--- Containers ---\n');
   data.set(field2, 8);
   data.set(offset, 16);
   data.set(field3, 20);
-  
+
   const result = benchmark('container with variable field (100 bytes)', 2000, () => {
     sszStreamRootFromSlice(containerType, data);
   });
@@ -204,7 +204,7 @@ console.log('--- Memory Efficiency ---\n');
   const chunkSize = 8000; // 1000 uint64s
   const chunks = 1250; // Total 10MB
   const listType: TypeDesc = { kind: TypeKind.List, elementType: uint64Type };
-  
+
   const start = Date.now();
   for (let chunk = 0; chunk < chunks; chunk++) {
     const data = new Uint8Array(chunkSize);
@@ -214,7 +214,7 @@ console.log('--- Memory Efficiency ---\n');
     sszStreamRootFromSlice(listType, data);
   }
   const end = Date.now();
-  
+
   console.log(`    Processed ${chunks} chunks (10MB total) in ${end - start}ms`);
   console.log(`    Throughput: ${Math.round(10000 / ((end - start) / 1000))} KB/sec\n`);
 }

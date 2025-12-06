@@ -70,7 +70,7 @@ async function computeRootFromChunksParallel(chunks, numThreads = 4) {
         for (let i = 0; i < subtrees.length; i++) {
             const promise = new Promise((resolve, reject) => {
                 const worker = new worker_threads_1.Worker(path.join(__dirname, 'merkle-worker.js'), {
-                    workerData: { chunks: subtrees[i], taskId: i }
+                    workerData: { chunks: subtrees[i], taskId: i },
                 });
                 workers.push(worker);
                 worker.on('message', (result) => {
@@ -92,7 +92,7 @@ async function computeRootFromChunksParallel(chunks, numThreads = 4) {
     }
     finally {
         // Clean up workers
-        workers.forEach(w => w.terminate());
+        workers.forEach((w) => w.terminate());
     }
 }
 /**

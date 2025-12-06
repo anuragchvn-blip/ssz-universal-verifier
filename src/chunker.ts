@@ -20,7 +20,7 @@ export function* streamChunksFromSlice(bytes: Uint8Array, ranges: Range[]): Gene
 export function* streamChunksFromReader(
   reader: (buf: Uint8Array) => number,
   ranges: Range[]
-): Generator<Uint8Array | { error: SszError, msg: string }> {
+): Generator<Uint8Array | { error: SszError; msg: string }> {
   const tempBuf = new Uint8Array(4096);
   let tempOffset = 0;
   let tempLen = 0;

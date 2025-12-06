@@ -31,7 +31,7 @@ export async function computeRootFromChunksParallel(
   if (chunks.length === 1) {
     return chunks[0];
   }
-  
+
   // For small trees, single-threaded is faster (avoid thread overhead)
   if (chunks.length < 64) {
     return computeRootSingleThreaded(chunks);
@@ -40,7 +40,7 @@ export async function computeRootFromChunksParallel(
   // Split chunks into subtrees for parallel processing
   const chunkSize = Math.ceil(chunks.length / numThreads);
   const subtrees: Uint8Array[][] = [];
-  
+
   for (let i = 0; i < chunks.length; i += chunkSize) {
     subtrees.push(chunks.slice(i, Math.min(i + chunkSize, chunks.length)));
   }
@@ -53,7 +53,7 @@ export async function computeRootFromChunksParallel(
     for (let i = 0; i < subtrees.length; i++) {
       const promise = new Promise<Uint8Array>((resolve, reject) => {
         const worker = new Worker(path.join(__dirname, 'merkle-worker.js'), {
-          workerData: { chunks: subtrees[i], taskId: i }
+          workerData: { chunks: subtrees[i], taskId: i },
         });
 
         workers.push(worker);
@@ -78,10 +78,9 @@ export async function computeRootFromChunksParallel(
 
     // Combine subtree roots into final root
     return computeRootSingleThreaded(subtreeRoots);
-
   } finally {
     // Clean up workers
-    workers.forEach(w => w.terminate());
+    workers.forEach((w) => w.terminate());
   }
 }
 
@@ -96,7 +95,7 @@ function computeRootSingleThreaded(chunks: Uint8Array[]): Uint8Array {
 
   while (currentLevel.length > 1) {
     const nextLevel: Uint8Array[] = [];
-    
+
     // Process in batches of 4 for SIMD
     let i = 0;
     while (i + 7 < currentLevel.length) {
@@ -107,7 +106,7 @@ function computeRootSingleThreaded(chunks: Uint8Array[]): Uint8Array {
         combined.set(currentLevel[i + j * 2 + 1], 32);
         batch.push(combined);
       }
-      
+
       for (const combined of batch) {
         const left = combined.subarray(0, 32);
         const right = combined.subarray(32, 64);
@@ -115,17 +114,17 @@ function computeRootSingleThreaded(chunks: Uint8Array[]): Uint8Array {
       }
       i += 8;
     }
-    
+
     while (i + 1 < currentLevel.length) {
       const parent = hashParent(currentLevel[i], currentLevel[i + 1]);
       nextLevel.push(parent);
       i += 2;
     }
-    
+
     if (i < currentLevel.length) {
       nextLevel.push(currentLevel[i]);
     }
-    
+
     currentLevel = nextLevel;
   }
 
@@ -158,13 +157,13 @@ export async function benchmarkParallelMerkleization() {
   for (const { size, iterations, threads } of testCases) {
     console.log(`\nTree size: ${size} leaves`);
     console.log(`Iterations: ${iterations}`);
-    
+
     const chunks = Array.from({ length: size }, () => generateChunk());
     const hashOpsPerMerkleization = size - 1;
 
     for (const numThreads of threads) {
       const start = performance.now();
-      
+
       for (let i = 0; i < iterations; i++) {
         if (numThreads === 1) {
           computeRootSingleThreaded(chunks);
@@ -172,13 +171,15 @@ export async function benchmarkParallelMerkleization() {
           await computeRootFromChunksParallel(chunks, numThreads);
         }
       }
-      
+
       const elapsed = (performance.now() - start) / 1000;
       const merkleizationsPerSec = iterations / elapsed;
       const totalHashOpsPerSec = merkleizationsPerSec * hashOpsPerMerkleization;
-      
-      console.log(`  ${numThreads} thread${numThreads > 1 ? 's' : ' '}: ${(totalHashOpsPerSec / 1000000).toFixed(2)}M hash ops/sec`);
-      
+
+      console.log(
+        `  ${numThreads} thread${numThreads > 1 ? 's' : ' '}: ${(totalHashOpsPerSec / 1000000).toFixed(2)}M hash ops/sec`
+      );
+
       if (totalHashOpsPerSec >= 3000000) {
         console.log(`    ✅ TARGET MET! (3M+)`);
       }

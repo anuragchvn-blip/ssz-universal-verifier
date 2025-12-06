@@ -15,7 +15,9 @@ function assert(cond: boolean, msg: string): void {
 }
 
 function hex(buf: Uint8Array): string {
-  return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(buf)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 function fromHex(s: string): Uint8Array {
@@ -46,7 +48,8 @@ console.log('=== Extended Test Suite: Basic Types ===\n');
 
 {
   const data = new Uint8Array(2);
-  data[0] = 0xff; data[1] = 0xff;
+  data[0] = 0xff;
+  data[1] = 0xff;
   const res = sszStreamRootFromSlice(uint16Type, data);
   assert('root' in res, 'uint16(65535) should succeed');
 }
@@ -208,8 +211,8 @@ console.log('=== Extended Test Suite: Containers ===\n');
     kind: TypeKind.Container,
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 8 },
-      { kind: TypeKind.Basic, fixedSize: 8 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 8 },
+    ],
   };
   const data = new Uint8Array(16);
   data[0] = 0x01;
@@ -226,8 +229,8 @@ console.log('=== Extended Test Suite: Containers ===\n');
       { kind: TypeKind.Basic, fixedSize: 8 },
       { kind: TypeKind.Basic, fixedSize: 8 },
       { kind: TypeKind.Basic, fixedSize: 8 },
-      { kind: TypeKind.Basic, fixedSize: 8 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 8 },
+    ],
   };
   const data = new Uint8Array(32);
   for (let i = 0; i < 4; i++) data[i * 8] = i;
@@ -241,8 +244,8 @@ console.log('=== Extended Test Suite: Containers ===\n');
     kind: TypeKind.Container,
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 8 },
-      { kind: TypeKind.Basic, fixedSize: 0 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 0 },
+    ],
   };
   const field1 = new Uint8Array(8);
   field1[0] = 0x42;
@@ -263,8 +266,8 @@ console.log('=== Extended Test Suite: Containers ===\n');
     kind: TypeKind.Container,
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 0 },
-      { kind: TypeKind.Basic, fixedSize: 0 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 0 },
+    ],
   };
   const offset1 = new Uint8Array(4);
   offset1[0] = 8;
@@ -292,7 +295,6 @@ console.log('=== Extended Test Suite: Edge Cases ===\n');
 }
 
 // Test: Bitlist edge cases
-
 
 // Test: Large lists for merkleization depth
 {
@@ -337,21 +339,30 @@ console.log('\n=== Extended Test Suite: Negative Cases ===\n');
   // Sentinel is 0
   const data = fromHex('00');
   const res = sszStreamRootFromSlice(bitlistType, data);
-  assert('error' in res && res.error === SszError.BitlistPadding, 'bitlist zero sentinel should fail');
+  assert(
+    'error' in res && res.error === SszError.BitlistPadding,
+    'bitlist zero sentinel should fail'
+  );
 }
 
 {
   // Padding bits are not zero
   const data = fromHex('1f'); // 00011111 - padding should be 000
   const res = sszStreamRootFromSlice(bitlistType, data);
-  assert('error' in res && res.error === SszError.BitlistPadding, 'bitlist non-zero padding should fail');
+  assert(
+    'error' in res && res.error === SszError.BitlistPadding,
+    'bitlist non-zero padding should fail'
+  );
 }
 
 {
   // Multiple non-zero padding bits
   const data = fromHex('7f'); // 01111111
   const res = sszStreamRootFromSlice(bitlistType, data);
-  assert('error' in res && res.error === SszError.BitlistPadding, 'bitlist multiple padding bits should fail');
+  assert(
+    'error' in res && res.error === SszError.BitlistPadding,
+    'bitlist multiple padding bits should fail'
+  );
 }
 
 // Test: List alignment issues
@@ -369,12 +380,15 @@ console.log('\n=== Extended Test Suite: Negative Cases ===\n');
     kind: TypeKind.Container,
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 8 },
-      { kind: TypeKind.Basic, fixedSize: 8 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 8 },
+    ],
   };
   const data = new Uint8Array(10); // should be 16
   const res = sszStreamRootFromSlice(containerType, data);
-  assert('error' in res && res.error === SszError.MalformedHeader, 'container too short should fail');
+  assert(
+    'error' in res && res.error === SszError.MalformedHeader,
+    'container too short should fail'
+  );
 }
 
 {
@@ -383,8 +397,8 @@ console.log('\n=== Extended Test Suite: Negative Cases ===\n');
     kind: TypeKind.Container,
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 8 },
-      { kind: TypeKind.Basic, fixedSize: 0 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 0 },
+    ],
   };
   const data = new Uint8Array(12);
   data[8] = 4; // offset points into header area
@@ -398,13 +412,16 @@ console.log('\n=== Extended Test Suite: Negative Cases ===\n');
     kind: TypeKind.Container,
     fieldTypes: [
       { kind: TypeKind.Basic, fixedSize: 8 },
-      { kind: TypeKind.Basic, fixedSize: 0 }
-    ]
+      { kind: TypeKind.Basic, fixedSize: 0 },
+    ],
   };
   const data = new Uint8Array(12);
   data[8] = 100; // offset beyond buffer
   const res = sszStreamRootFromSlice(containerType, data);
-  assert('error' in res && res.error === SszError.LengthOverflow, 'offset beyond buffer should fail');
+  assert(
+    'error' in res && res.error === SszError.LengthOverflow,
+    'offset beyond buffer should fail'
+  );
 }
 
 console.log(`\n✅ Extended Tests: ${passed} passed, ${failed} failed\n`);

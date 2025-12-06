@@ -3,7 +3,7 @@ export enum TypeKind {
   Vector = 1,
   List = 2,
   Container = 3,
-  Bitlist = 4
+  Bitlist = 4,
 }
 
 export interface TypeDesc {
@@ -22,7 +22,7 @@ export enum SszError {
   UnsupportedType = 4,
   MalformedHeader = 5,
   LengthOverflow = 6,
-  UnexpectedEOF = 7
+  UnexpectedEOF = 7,
 }
 
 export interface Range {

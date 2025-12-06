@@ -132,3 +132,4 @@ else {
     console.log(`   Target: 3M+ ops/sec`);
     console.log(`   Note: Requires modern CPU (2020+) with SHA extensions`);
 }
+//# sourceMappingURL=bench-native.js.map

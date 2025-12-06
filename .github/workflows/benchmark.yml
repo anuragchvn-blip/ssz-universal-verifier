@@ -1,0 +1,68 @@
+name: Performance Benchmarks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run TypeScript benchmarks
+        run: |
+          echo "## TypeScript Benchmarks" >> $GITHUB_STEP_SUMMARY
+          npm run bench >> $GITHUB_STEP_SUMMARY 2>&1
+
+      - name: Run advanced benchmarks
+        run: |
+          echo "## Advanced Benchmarks" >> $GITHUB_STEP_SUMMARY
+          npm run bench:advanced >> $GITHUB_STEP_SUMMARY 2>&1
+        continue-on-error: true
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Rust benchmarks
+        working-directory: rust-skel
+        run: |
+          echo "## Rust Benchmarks" >> $GITHUB_STEP_SUMMARY
+          cargo bench --no-run >> $GITHUB_STEP_SUMMARY 2>&1
+        continue-on-error: true
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = process.env.GITHUB_STEP_SUMMARY;
+            if (fs.existsSync(summary)) {
+              const content = fs.readFileSync(summary, 'utf8');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '## 📊 Benchmark Results\n\n' + content
+              });
+            }

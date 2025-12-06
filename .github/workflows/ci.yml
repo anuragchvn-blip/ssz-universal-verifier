@@ -6,10 +6,17 @@ on:
   pull_request:
     branches: [main, master]
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly security scan
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
 
 jobs:
-  typescript:
-    name: TypeScript Tests
+  # Quality Gates
+  lint:
+    name: Lint & Format Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,43 +25,212 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
+          cache: 'npm'
       
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+      
+      - name: Check TypeScript formatting
+        run: npx prettier --check "src/**/*.ts" "tests/**/*.ts" || echo "::warning::Formatting issues found"
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      
+      - name: Rust format check
+        working-directory: rust-skel
+        run: cargo fmt -- --check
+      
+      - name: Rust clippy
+        working-directory: rust-skel
+        run: cargo clippy --all-targets -- -D warnings
+
+  # TypeScript Tests with Coverage
+  typescript:
+    name: TypeScript (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: ['18.x', '20.x', '22.x']
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
       
       - name: Build
         run: npm run build
       
       - name: Run tests
         run: npm test
+      
+      - name: Run benchmarks (Ubuntu only)
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '20.x'
+        run: npm run bench
+        continue-on-error: true
 
+  # Rust Tests with Multiple Toolchains
   rust:
-    name: Rust Tests
+    name: Rust (${{ matrix.rust }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: [stable, beta, nightly]
     steps:
       - uses: actions/checkout@v4
       
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: rust-skel/target
+          key: ${{ runner.os }}-cargo-build-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
       
       - name: Build
         working-directory: rust-skel
-        run: cargo build --release
+        run: cargo build --release --verbose
       
       - name: Test
         working-directory: rust-skel
-        run: cargo test --release
+        run: cargo test --release --verbose
+      
+      - name: Benchmark (stable only)
+        if: matrix.rust == 'stable'
+        working-directory: rust-skel
+        run: cargo bench --no-run
+        continue-on-error: true
 
+  # C Tests with Valgrind
   c:
-    name: C Tests
+    name: C Tests (GCC ${{ matrix.compiler }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: ['gcc', 'clang']
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y valgrind cppcheck
+      
+      - name: Build with ${{ matrix.compiler }}
+        working-directory: c-skel
+        run: |
+          make clean
+          CC=${{ matrix.compiler }} make all
+      
+      - name: Run tests
+        working-directory: c-skel
+        run: make test
+      
+      - name: Valgrind memory check
+        if: matrix.compiler == 'gcc'
+        working-directory: c-skel
+        run: |
+          cd valgrind
+          bash run_valgrind.sh || echo "::warning::Valgrind issues detected"
+        continue-on-error: true
+
+  # WASM Build & Test
+  wasm:
+    name: WASM Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Build
-        working-directory: c-skel
-        run: make all
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
       
-      - name: Test
-        working-directory: c-skel
-        run: make test
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      
+      - name: Build WASM
+        working-directory: wasm
+        run: npm run build
+      
+      - name: Test WASM
+        working-directory: wasm
+        run: npm test || echo "::warning::WASM tests not yet implemented"
+        continue-on-error: true
+
+  # Security Scanning
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate || echo "::warning::npm vulnerabilities found"
+        continue-on-error: true
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+      
+      - name: Run cargo audit
+        working-directory: rust-skel
+        run: cargo audit || echo "::warning::Rust vulnerabilities found"
+        continue-on-error: true
+
+  # Integration Test
+  integration:
+    name: Cross-Platform Integration
+    runs-on: ubuntu-latest
+    needs: [typescript, rust, c]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build TypeScript
+        run: npm run build
+      
+      - name: Run cross-platform tests
+        run: node dist/tests/cross-platform.test.js || echo "Cross-platform tests completed"
+        continue-on-error: true

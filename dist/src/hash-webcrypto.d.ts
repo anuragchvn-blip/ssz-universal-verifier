@@ -29,3 +29,4 @@ export declare function isWebCryptoAvailable(): boolean;
  * Get WebCrypto implementation info for debugging
  */
 export declare function getWebCryptoInfo(): string;
+//# sourceMappingURL=hash-webcrypto.d.ts.map

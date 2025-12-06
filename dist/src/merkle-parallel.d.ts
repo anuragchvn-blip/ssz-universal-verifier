@@ -11,3 +11,4 @@ export declare function computeRootFromChunksParallel(chunks: Uint8Array[], numT
  * Benchmark parallel merkleization
  */
 export declare function benchmarkParallelMerkleization(): Promise<void>;
+//# sourceMappingURL=merkle-parallel.d.ts.map

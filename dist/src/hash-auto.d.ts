@@ -17,3 +17,4 @@ export declare function isWasm(): boolean;
  * Check if we're using pure TypeScript
  */
 export declare function isPureTS(): boolean;
+//# sourceMappingURL=hash-auto.d.ts.map

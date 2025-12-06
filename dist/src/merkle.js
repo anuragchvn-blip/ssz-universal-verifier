@@ -50,3 +50,4 @@ function mixinLengthRoot(root, length) {
     lengthBuf[3] = (length >>> 24) & 0xff;
     return (0, hash_js_1.hashParent)(root, lengthBuf);
 }
+//# sourceMappingURL=merkle.js.map

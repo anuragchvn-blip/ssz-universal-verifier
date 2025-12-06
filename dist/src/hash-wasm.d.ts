@@ -1,21 +1,19 @@
 /**
- * WASM-accelerated SHA-256 using @chainsafe/as-sha256
- * Synchronous, ~10-20x faster than pure TypeScript
+ * SHA-256 hashing using our own pure TypeScript implementation
+ * Independent of external dependencies
  */
 /**
- * Hash a single 32-byte chunk using WASM
- * ~10-20x faster than pure TypeScript
+ * Hash a single 32-byte chunk
+ * Uses our own pure TypeScript SHA-256
  */
 export declare function hashLeafWasm(chunk32: Uint8Array): Uint8Array;
 /**
- * Hash parent node (64 bytes) using WASM
- * ~10-20x faster than pure TypeScript
- * Uses optimized digest2Bytes32 for two 32-byte inputs
+ * Hash parent node (64 bytes)
+ * Uses our own pure TypeScript SHA-256
  */
 export declare function hashParentWasm(left32: Uint8Array, right32: Uint8Array): Uint8Array;
 /**
- * Batch hash multiple parent nodes using optimized WASM
- * Uses batchHash4UintArray64s for maximum performance (hashes 4 pairs in parallel)
+ * Batch hash multiple parent nodes using WASM
  */
 export declare function hashParentBatchWasm(pairs: Array<{
     left: Uint8Array;
@@ -27,5 +25,7 @@ export declare function hashParentBatchWasm(pairs: Array<{
 export declare function computeRootFromChunksWasm(chunks: Uint8Array[]): Uint8Array;
 /**
  * Check if WASM acceleration is available
+ * Currently using pure TypeScript implementation
  */
 export declare function isWasmAvailable(): boolean;
+//# sourceMappingURL=hash-wasm.d.ts.map

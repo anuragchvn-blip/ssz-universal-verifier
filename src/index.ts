@@ -3,7 +3,8 @@ import { parseToRanges } from './sszParser.js';
 import { streamChunksFromSlice, streamChunksFromReader } from './chunker.js';
 import { computeRootFromChunks } from './merkle.js';
 
-export { TypeDesc, TypeKind, SszError };
+export type { TypeDesc };
+export { TypeKind, SszError };
 
 export function sszStreamRootFromSlice(
   td: TypeDesc,

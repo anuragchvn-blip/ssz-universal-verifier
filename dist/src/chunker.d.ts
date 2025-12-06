@@ -4,3 +4,4 @@ export declare function streamChunksFromReader(reader: (buf: Uint8Array) => numb
     error: SszError;
     msg: string;
 }>;
+//# sourceMappingURL=chunker.d.ts.map

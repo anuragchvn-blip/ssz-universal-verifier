@@ -1,29 +1,30 @@
 version: 2
 updates:
-  # Enable version updates for npm
+  # NPM dependencies
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
     open-pull-requests-limit: 10
     reviewers:
-      - "YOUR_USERNAME"
+      - "anuragchvn-blip"
     labels:
       - "dependencies"
       - "javascript"
     commit-message:
       prefix: "npm"
-      prefix-development: "npm(dev)"
       include: "scope"
 
-  # Enable version updates for Cargo
+  # Rust dependencies
   - package-ecosystem: "cargo"
     directory: "/rust-skel"
     schedule:
       interval: "weekly"
+      day: "monday"
     open-pull-requests-limit: 10
     reviewers:
-      - "YOUR_USERNAME"
+      - "anuragchvn-blip"
     labels:
       - "dependencies"
       - "rust"

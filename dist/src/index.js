@@ -44,3 +44,4 @@ function sszStreamRootFromReader(td, reader) {
     }
     return sszStreamRootFromSlice(td, allBytes);
 }
+//# sourceMappingURL=index.js.map

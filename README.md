@@ -64,8 +64,8 @@ This is the **only SSZ verifier with zero runtime dependencies** and universal p
 | **C** | ✅ Production | 42/42 | 319 | `no_std`, Basic/Vector/List/Container/Bitlist |
 | **Rust** | ✅ Production | 17/17 | 805 | `#![no_std]`, full SSZ support |
 | **WASM** | ✅ Working | - | - | Browser + Node.js ready |
-| **Native Addon** | ✅ Compiles | - | - | Intel SHA-NI support (needs verification) |
-| **zkVM** | ⏳ 60% | - | - | RISC Zero integration in progress |
+| **Native Addon** | ⚠️ Unverified | - | - | Built, SHA-NI acceleration untested (requires 2016+ CPU) |
+| **zkVM** | ✅ Buildable (WSL2) | - | - | RISC Zero guest code complete, requires WSL2 on Windows |
 
 ## Build & Test
 
@@ -82,9 +82,9 @@ npm run bench         # Run performance benchmarks
 
 Expected output: `59 passed, 0 failed`
 
-**Performance**: 476K ops/sec (uint64), 1.3 MB/sec throughput
+**Performance**: 476K ops/sec verified (uint64), 1.3 MB/sec throughput on i7-2600 (2011)
 
-**Hardware Requirements**: None (pure software), optional SHA-NI for native acceleration
+**Hardware Requirements**: None (pure software). Native SHA-NI addon built but untested (requires Intel Goldmont/Ryzen 2016+)
 
 ### C skeleton
 

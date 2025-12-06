@@ -21,6 +21,8 @@ export function parseToRanges(td: TypeDesc, bytes: Uint8Array): { ranges: Range[
     let sentinel = lastByte;
     while (sentinel > 1) { bitLen++; sentinel >>= 1; }
     const paddingBits = (bytes.length * 8) - bitLen - 1;
+    // Fix: prevent overflow for paddingBits >= 31
+    if (paddingBits >= 31) return { ranges: [], error: SszError.BitlistPadding, msg: 'Bitlist padding overflow' };
     const mask = (1 << paddingBits) - 1;
     if ((lastByte & mask) !== 0) return { ranges: [], error: SszError.BitlistPadding, msg: 'Bitlist padding non-zero' };
     return { ranges: [{ start: 0, end: bytes.length }], error: SszError.None, msg: '' };
@@ -148,5 +150,6 @@ function parseVariableContainer(td: TypeDesc, bytes: Uint8Array, fixedFields: bo
 }
 
 function readU32LE(bytes: Uint8Array, offset: number): number {
-  return bytes[offset] | (bytes[offset + 1] << 8) | (bytes[offset + 2] << 16) | (bytes[offset + 3] << 24);
+  // Fix: use unsigned right-shift to prevent sign extension and ensure result is non-negative
+  return (bytes[offset] | (bytes[offset + 1] << 8) | (bytes[offset + 2] << 16) | (bytes[offset + 3] << 24)) >>> 0;
 }

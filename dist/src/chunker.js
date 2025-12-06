@@ -57,3 +57,4 @@ function* streamChunksFromReader(reader, ranges) {
         }
     }
 }
+//# sourceMappingURL=chunker.js.map

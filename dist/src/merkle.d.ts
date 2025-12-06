@@ -8,3 +8,4 @@ export declare function computeRootFromChunks(chunkGen: Generator<Uint8Array | {
     error: SszError;
     msg: string;
 };
+//# sourceMappingURL=merkle.d.ts.map

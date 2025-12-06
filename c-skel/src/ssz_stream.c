@@ -180,8 +180,11 @@ int ssz_stream_root_from_buffer(
           return SSZ_ERR_NON_CANONICAL;
         }
         
-        uint32_t field_offset = bytes[offset] | (bytes[offset+1] << 8) | 
-                               (bytes[offset+2] << 16) | (bytes[offset+3] << 24);
+        /* Fix: ensure safe cast to unsigned - prevent sign extension */
+        uint32_t field_offset = ((uint32_t)bytes[offset]) | 
+                               ((uint32_t)bytes[offset+1] << 8) | 
+                               ((uint32_t)bytes[offset+2] << 16) | 
+                               ((uint32_t)bytes[offset+3] << 24);
         offset += 4;
         
         /* Validate offset points into data region */

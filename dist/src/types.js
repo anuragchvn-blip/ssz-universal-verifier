@@ -20,3 +20,4 @@ var SszError;
     SszError[SszError["LengthOverflow"] = 6] = "LengthOverflow";
     SszError[SszError["UnexpectedEOF"] = 7] = "UnexpectedEOF";
 })(SszError || (exports.SszError = SszError = {}));
+//# sourceMappingURL=types.js.map

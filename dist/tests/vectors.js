@@ -267,3 +267,4 @@ const listBytes32 = { kind: index_js_1.TypeKind.List, elementType: bytes32Type }
 }
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
+//# sourceMappingURL=vectors.js.map

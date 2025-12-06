@@ -113,3 +113,4 @@ console.log(`  ${(ops / 1000000).toFixed(2)}M ops/sec\n`);
 console.log('=== Conclusion ===');
 console.log('If wrappers are slower, we should use sha256 functions directly.');
 console.log('If we\'re still under 3M ops/sec, the issue is algorithmic, not wrapper overhead.');
+//# sourceMappingURL=direct-benchmark.js.map

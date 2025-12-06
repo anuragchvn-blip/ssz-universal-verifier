@@ -3,12 +3,11 @@ name = "ssz-zkvm-methods"
 version.workspace = true
 edition.workspace = true
 
-[dependencies]
-risc0-zkvm = { workspace = true }
-
 [build-dependencies]
 risc0-build = { workspace = true }
 
-[[bin]]
-name = "ssz_verify"
-path = "guest/src/main.rs"
+[package.metadata.risc0]
+methods = ["guest"]
+
+[lib]
+path = "src/lib.rs"

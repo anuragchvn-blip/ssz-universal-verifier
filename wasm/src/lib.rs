@@ -164,7 +164,8 @@ fn compute_root(data: &[u8], type_desc: &TypeDescriptor) -> Result<Vec<u8>, Stri
             
             // Remove delimiter bit and compute chunks
             let mut data_copy = data.to_vec();
-            let last_byte = data_copy.last_mut().unwrap();
+            let last_byte = data_copy.last_mut()
+                .ok_or("Bitlist data unexpectedly empty after validation")?;
             let delimiter_bit = 7 - last_byte.leading_zeros() as usize;
             *last_byte &= (1 << delimiter_bit) - 1;
             

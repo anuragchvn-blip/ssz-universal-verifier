@@ -41,7 +41,7 @@ exports.computeRootFromChunksParallel = computeRootFromChunksParallel;
 exports.benchmarkParallelMerkleization = benchmarkParallelMerkleization;
 const worker_threads_1 = require("worker_threads");
 const path = __importStar(require("path"));
-const sha256 = __importStar(require("@chainsafe/as-sha256"));
+const hash_js_1 = require("./hash.js");
 /**
  * Parallel merkleization using worker threads
  * Splits tree into subtrees, processes in parallel, combines results
@@ -116,12 +116,15 @@ function computeRootSingleThreaded(chunks) {
                 combined.set(currentLevel[i + j * 2 + 1], 32);
                 batch.push(combined);
             }
-            const results = sha256.batchHash4UintArray64s(batch);
-            nextLevel.push(...results);
+            for (const combined of batch) {
+                const left = combined.subarray(0, 32);
+                const right = combined.subarray(32, 64);
+                nextLevel.push((0, hash_js_1.hashParent)(left, right));
+            }
             i += 8;
         }
         while (i + 1 < currentLevel.length) {
-            const parent = sha256.digest2Bytes32(currentLevel[i], currentLevel[i + 1]);
+            const parent = (0, hash_js_1.hashParent)(currentLevel[i], currentLevel[i + 1]);
             nextLevel.push(parent);
             i += 2;
         }
@@ -185,3 +188,4 @@ async function benchmarkParallelMerkleization() {
 if (require.main === module) {
     benchmarkParallelMerkleization().catch(console.error);
 }
+//# sourceMappingURL=merkle-parallel.js.map

@@ -26,3 +26,4 @@ export interface Range {
     start: number;
     end: number;
 }
+//# sourceMappingURL=types.d.ts.map

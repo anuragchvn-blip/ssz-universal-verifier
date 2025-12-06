@@ -1,5 +1,6 @@
 import { TypeDesc, TypeKind, SszError } from './types.js';
-export { TypeDesc, TypeKind, SszError };
+export type { TypeDesc };
+export { TypeKind, SszError };
 export declare function sszStreamRootFromSlice(td: TypeDesc, bytes: Uint8Array): {
     root: Uint8Array;
 } | {
@@ -12,3 +13,4 @@ export declare function sszStreamRootFromReader(td: TypeDesc, reader: (buf: Uint
     error: SszError;
     msg: string;
 };
+//# sourceMappingURL=index.d.ts.map

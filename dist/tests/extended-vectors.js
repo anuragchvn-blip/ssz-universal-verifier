@@ -367,3 +367,4 @@ console.log('\n=== Extended Test Suite: Negative Cases ===\n');
 }
 console.log(`\n✅ Extended Tests: ${passed} passed, ${failed} failed\n`);
 process.exit(failed > 0 ? 1 : 0);
+//# sourceMappingURL=extended-vectors.js.map

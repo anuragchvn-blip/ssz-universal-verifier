@@ -28,6 +28,9 @@ function parseToRanges(td, bytes) {
             sentinel >>= 1;
         }
         const paddingBits = (bytes.length * 8) - bitLen - 1;
+        // Fix: prevent overflow for paddingBits >= 31
+        if (paddingBits >= 31)
+            return { ranges: [], error: types_js_1.SszError.BitlistPadding, msg: 'Bitlist padding overflow' };
         const mask = (1 << paddingBits) - 1;
         if ((lastByte & mask) !== 0)
             return { ranges: [], error: types_js_1.SszError.BitlistPadding, msg: 'Bitlist padding non-zero' };
@@ -170,5 +173,7 @@ function parseVariableContainer(td, bytes, fixedFields) {
     return { ranges, error: types_js_1.SszError.None, msg: '' };
 }
 function readU32LE(bytes, offset) {
-    return bytes[offset] | (bytes[offset + 1] << 8) | (bytes[offset + 2] << 16) | (bytes[offset + 3] << 24);
+    // Fix: use unsigned right-shift to prevent sign extension and ensure result is non-negative
+    return (bytes[offset] | (bytes[offset + 1] << 8) | (bytes[offset + 2] << 16) | (bytes[offset + 3] << 24)) >>> 0;
 }
+//# sourceMappingURL=sszParser.js.map

@@ -3,43 +3,10 @@
  * Optimized WASM merkleizer with batch processing
  * Goal: Achieve 3M+ hash operations per second in tree context
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.computeRootFromChunksOptimized = computeRootFromChunksOptimized;
 exports.benchmarkMerkleizationThroughput = benchmarkMerkleizationThroughput;
-const sha256 = __importStar(require("@chainsafe/as-sha256"));
+const hash_js_1 = require("./hash.js");
 /**
  * Optimized merkleization using batch operations
  * Processes tree levels in batches of 4 for SIMD optimization
@@ -67,14 +34,17 @@ function computeRootFromChunksOptimized(chunks) {
                 combined.set(right, 32);
                 batch.push(combined);
             }
-            // Hash 4 parent nodes in parallel
-            const results = sha256.batchHash4UintArray64s(batch);
-            nextLevel.push(...results);
+            // Hash 4 parent nodes
+            for (const combined of batch) {
+                const left = combined.subarray(0, 32);
+                const right = combined.subarray(32, 64);
+                nextLevel.push((0, hash_js_1.hashParent)(left, right));
+            }
             i += 8;
         }
         // Process remaining pairs individually
         while (i + 1 < currentLevel.length) {
-            const parent = sha256.digest2Bytes32(currentLevel[i], currentLevel[i + 1]);
+            const parent = (0, hash_js_1.hashParent)(currentLevel[i], currentLevel[i + 1]);
             nextLevel.push(parent);
             i += 2;
         }
@@ -136,3 +106,4 @@ function benchmarkMerkleizationThroughput() {
 if (require.main === module) {
     benchmarkMerkleizationThroughput();
 }
+//# sourceMappingURL=merkle-optimized.js.map

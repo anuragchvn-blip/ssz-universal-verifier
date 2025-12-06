@@ -1,0 +1,46 @@
+# Development files
+.git
+.github
+.vscode
+.idea
+*.log
+*.swp
+*.swo
+*~
+
+# Source files (only ship dist)
+src/
+tests/
+examples/
+
+# Build artifacts
+build/
+coverage/
+.nyc_output/
+*.tsbuildinfo
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation (keep only essential)
+docs/
+*.draft.md
+CONTRIBUTING.md
+PRODUCTION_STATUS.md
+BATTLE_PLAN.md
+
+# Test and development
+*.test.ts
+*.spec.ts
+*.test.js
+*.spec.js
+test/
+__tests__/
+
+# Misc
+.DS_Store
+Thumbs.db
+.env
+.env.local

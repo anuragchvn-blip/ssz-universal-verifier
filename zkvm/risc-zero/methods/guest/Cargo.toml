@@ -4,4 +4,8 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-risc0-zkvm = { workspace = true }
+risc0-zkvm = { workspace = true, default-features = false }
+
+[[bin]]
+name = "ssz-verify-guest"
+path = "src/main.rs"

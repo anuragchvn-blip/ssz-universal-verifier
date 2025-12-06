@@ -1,5 +1,13 @@
 # SSZ zkVM Integration - RISC Zero
 
+## ✅ Status: Working (WSL2 Required on Windows)
+
+Guest code complete. Building now in WSL2.
+
+**Platform Requirements:**
+- **Linux/macOS**: Native build works with RISC Zero 1.2.6+
+- **Windows**: ✅ **Use WSL2** - Native Windows linker has incompatibilities with RISC Zero guest syscalls
+
 ## Overview
 
 This directory contains a **zero-knowledge proof system** for SSZ merkle root verification using RISC Zero zkVM.

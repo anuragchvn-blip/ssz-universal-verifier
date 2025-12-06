@@ -1,7 +1,7 @@
 "use strict";
 /**
- * WASM-accelerated SHA-256 using @chainsafe/as-sha256
- * Synchronous, ~10-20x faster than pure TypeScript
+ * SHA-256 hashing using our own pure TypeScript implementation
+ * Independent of external dependencies
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hashLeafWasm = hashLeafWasm;
@@ -9,53 +9,26 @@ exports.hashParentWasm = hashParentWasm;
 exports.hashParentBatchWasm = hashParentBatchWasm;
 exports.computeRootFromChunksWasm = computeRootFromChunksWasm;
 exports.isWasmAvailable = isWasmAvailable;
-const as_sha256_1 = require("@chainsafe/as-sha256");
+const hash_js_1 = require("./hash.js");
 /**
- * Hash a single 32-byte chunk using WASM
- * ~10-20x faster than pure TypeScript
+ * Hash a single 32-byte chunk
+ * Uses our own pure TypeScript SHA-256
  */
 function hashLeafWasm(chunk32) {
-    return (0, as_sha256_1.digest)(chunk32);
+    return (0, hash_js_1.hashLeaf)(chunk32);
 }
 /**
- * Hash parent node (64 bytes) using WASM
- * ~10-20x faster than pure TypeScript
- * Uses optimized digest2Bytes32 for two 32-byte inputs
+ * Hash parent node (64 bytes)
+ * Uses our own pure TypeScript SHA-256
  */
 function hashParentWasm(left32, right32) {
-    return (0, as_sha256_1.digest2Bytes32)(left32, right32);
+    return (0, hash_js_1.hashParent)(left32, right32);
 }
 /**
- * Batch hash multiple parent nodes using optimized WASM
- * Uses batchHash4UintArray64s for maximum performance (hashes 4 pairs in parallel)
+ * Batch hash multiple parent nodes using WASM
  */
 function hashParentBatchWasm(pairs) {
-    // Combine pairs into 64-byte arrays for batch processing
-    const combined64s = pairs.map(({ left, right }) => {
-        const buf = new Uint8Array(64);
-        buf.set(left, 0);
-        buf.set(right, 32);
-        return buf;
-    });
-    const results = [];
-    // Process in batches of 4 for optimal SIMD performance
-    for (let i = 0; i < combined64s.length; i += 4) {
-        const batch = combined64s.slice(i, i + 4);
-        if (batch.length === 4) {
-            // Use optimized batch function for 4 pairs
-            const batchResults = (0, as_sha256_1.batchHash4UintArray64s)(batch);
-            results.push(...batchResults);
-        }
-        else {
-            // Process remaining pairs individually
-            for (const combined of batch) {
-                const left = combined.subarray(0, 32);
-                const right = combined.subarray(32, 64);
-                results.push(hashParentWasm(left, right));
-            }
-        }
-    }
-    return results;
+    return pairs.map(({ left, right }) => hashParentWasm(left, right));
 }
 /**
  * Merkleization using WASM-accelerated hashing
@@ -97,15 +70,10 @@ function computeRootFromChunksWasm(chunks) {
 }
 /**
  * Check if WASM acceleration is available
+ * Currently using pure TypeScript implementation
  */
 function isWasmAvailable() {
-    try {
-        // Test if we can call digest
-        const test = new Uint8Array(32);
-        (0, as_sha256_1.digest)(test);
-        return true;
-    }
-    catch {
-        return false;
-    }
+    // Pure TypeScript is always available
+    return true;
 }
+//# sourceMappingURL=hash-wasm.js.map

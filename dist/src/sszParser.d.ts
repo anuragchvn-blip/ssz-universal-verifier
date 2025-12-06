@@ -4,3 +4,4 @@ export declare function parseToRanges(td: TypeDesc, bytes: Uint8Array): {
     error: SszError;
     msg: string;
 };
+//# sourceMappingURL=sszParser.d.ts.map

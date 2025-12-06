@@ -73,3 +73,4 @@ function isWasm() {
 function isPureTS() {
     return hashImpl.info.includes('TypeScript');
 }
+//# sourceMappingURL=hash-auto.js.map

@@ -9,9 +9,9 @@ wh# Battle Plan: Making This the Best SSZ Implementation
 - ✅ Own Rust WASM implementation (wasm/src/)
 - ⚠️ **Currently using @chainsafe/as-sha256 (temporary)**
 
-**What You'll Have After Native Addon**:
+**What You'll Have After Native Addon Verification**:
 - ✅ 100% independent implementation (zero SSZ dependencies)
-- ✅ Fastest SSZ verifier (5-10M ops/sec with native SHA)
+- ⚠️ Potentially fastest SSZ verifier (5-10M ops/sec with SHA-NI - UNVERIFIED, needs 2016+ CPU)
 - ✅ Multi-platform: native → our WASM → pure TS fallback
 - ✅ Simpler, cleaner, no external hash dependencies
 
@@ -22,9 +22,9 @@ wh# Battle Plan: Making This the Best SSZ Implementation
 4. 400K+ npm downloads
 
 **What You'll Have That They Don't**:
-1. ✅ Native SHA extensions (5-10M ops/sec vs their 3-5M)
-2. ✅ RISC-V zkVM support (unique)
-3. ✅ Embedded systems focus (C implementation)
+1. ⚠️ Native SHA extensions addon (5-10M ops/sec claim UNVERIFIED - requires modern CPU testing)
+2. ✅ RISC-V cross-compilation support (unique)
+3. ✅ Embedded systems focus (C implementation, AFL++ fuzzed)
 4. ✅ Streaming architecture (lower memory footprint)
 
 ## Strategy: Differentiate, Don't Duplicate
@@ -180,12 +180,12 @@ throw new SSZError(
 ### Phase 2: Universality (Weeks 4-6) 🔧
 1. ✅ **Fix C implementation** - Container/Bitlist types implemented
 2. **RISC-V Docker CI** - Prove it works
-3. ⏳ **zkVM integration** - RISC Zero implementation IN PROGRESS (60% - build issues)
+3. 🔄 **zkVM integration** - RISC Zero guest code complete, build blocked on Windows (documented as future work)
 
-**Result**: "Only SSZ verifier targeting zkVMs" (in development)
+**Result**: "SSZ verifier with RISC-V support + zkVM guest code ready for Linux/macOS"
 
 ### Phase 3: Trust (Weeks 7-9) 🔒
-1. **10M fuzz iterations** - Find any bugs
+1. ✅ **24-hour AFL++ fuzzing campaign** - RUNNING NOW (tmux session afl_24h, 12K exec/sec)
 2. **Security documentation** - Professional audit-ready
 3. **Formal proofs** - Start with determinism
 
@@ -236,7 +236,8 @@ npm run bench:native
 - ✅ 100% independent SHA-256 implementation
 - ✅ Fully independent implementation
 
-**Expected**: 5-7M ops/sec on modern Intel/AMD CPUs
+**Expected**: 5-7M ops/sec on modern Intel/AMD CPUs with SHA-NI (2016+) - UNVERIFIED
+**Verified**: 476K ops/sec on i7-2600 (2011) without SHA-NI
 
 ### Priority 2: Fix C Implementation
 
@@ -275,9 +276,9 @@ EOF
 ## Success Metrics
 
 **6 Months**:
-- ⏳ 5-10M ops/sec on modern CPUs (native addon built, needs SHA-NI hardware)
-- ⏳ RISC-V zkVM integration working (60% complete, build issues)
-- ✅ 10M+ fuzz iterations campaign running
+- ⚠️ 5-10M ops/sec claim UNVERIFIED (native addon built, requires 2016+ CPU with SHA-NI for testing)
+- ⏳ RISC-V cross-compilation working, zkVM (RISC Zero) future work (blocked on Windows build)
+- ✅ 24-hour AFL++ fuzzing campaign RUNNING (12K exec/sec, tmux session afl_24h)
 - ⏳ Ethereum Foundation grant submission
 - ⏳ 1,000+ GitHub stars
 - ⏳ 10,000+ npm downloads/week

@@ -11,3 +11,4 @@ export declare function computeRootFromChunksOptimized(chunks: Uint8Array[]): Ui
  * Benchmark: Merkleization throughput (hash operations per second)
  */
 export declare function benchmarkMerkleizationThroughput(): void;
+//# sourceMappingURL=merkle-optimized.d.ts.map

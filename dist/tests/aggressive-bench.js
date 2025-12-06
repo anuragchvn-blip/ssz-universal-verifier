@@ -170,3 +170,4 @@ console.log('Hardware considerations:');
 console.log(`• Platform: ${process.platform} ${process.arch}`);
 console.log(`• Node.js: ${process.version}`);
 console.log(`• V8: ${process.versions.v8}`);
+//# sourceMappingURL=aggressive-bench.js.map

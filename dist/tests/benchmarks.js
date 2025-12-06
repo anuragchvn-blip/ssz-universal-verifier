@@ -190,3 +190,4 @@ console.log('Implementation: Pure TypeScript with SHA-256');
 console.log('Platform:', process.platform, process.arch);
 console.log('Node.js:', process.version);
 console.log('\nNote: For production use, consider native SHA-256 (10-100x faster)\n');
+//# sourceMappingURL=benchmarks.js.map
